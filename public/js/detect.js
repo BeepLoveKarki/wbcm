@@ -6,7 +6,7 @@ let  scanSettings = new ScanditSDK.ScanSettings({
 });
 
 ScanditSDK.configure(licenseKey, {
-  engineLocation: "/static/js/build/",
+  engineLocation: "https://unpkg.com/scandit-sdk/build",
   preloadEngineLibrary: false,
   preloadCameras: false
 });
