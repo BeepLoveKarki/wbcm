@@ -129,12 +129,20 @@ iframe {
 .limiter {
   width: 100%;
   margin: 0 auto;
-  height:627px;
+  height:620px;
+}
+
+.txt1,.txt2{
+   display:inline;
+}
+
+.txt2:hover,.sel:hover{
+  cursor:pointer;
 }
 
 .container-login100 {
   width: 100%;  
-  min-height: 100vh;
+  min-height: 110vh;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -147,14 +155,16 @@ iframe {
   background-image:url("http://s1.picswalls.com/wallpapers/2014/08/08/nepal-desktop-wallpapers_020619663_168.jpg");
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-position: center; 
+  background-position: center;
+  margin-top:5px;
+  margin-bottom:5px;
 }
 
 .wrap-login100 {
   width: 500px;
   background: #fff;
   border-radius: 10px;
-  overflow: hidden;
+  
 
   box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
@@ -188,11 +198,10 @@ iframe {
   position: relative;
   background-color: #fff;
   border: 1px solid #e6e6e6;
+  margin-top:10px;
 }
 
-.wrap-input100.rs1 {
-  border-top: none;
-}
+
 
 .input100 {
   display: block;
