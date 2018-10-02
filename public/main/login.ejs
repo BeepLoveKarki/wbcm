@@ -21,7 +21,7 @@
 					</div>
                    
 				   <div class="sin">
-				   <form class="login100-form validate-form" method="POST" action="/signin">
+				   <form class="login100-form validate-form">
 					<div class="wrap-input100" style="margin-top:20px;">
 						<input class="input100" type="text" name="user" placeholder="Username" required>
 						<span class="focus-input100-1"></span>
@@ -44,7 +44,7 @@
 					</div>
 					
 					<div class="sup" style=" display:none;">
-					<form class="login100-form validate-form" method="POST" action="/signup">
+					<form class="login100-form validate-form signup">
 					  <div class="wrap-input100 rs1">
 						<input class="input100" type="text" name="name" placeholder="Name" required>
 						<span class="focus-input100-1"></span>
@@ -61,7 +61,7 @@
 						<span class="focus-input100-2"></span>
 					</div>
 					<div class="wrap-input100 rs1">
-						<input class="input100" type="email" name="email" placeholder="Password recovery email" required>
+						<input class="input100" id="email" type="email" name="email" placeholder="Password recovery email" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
@@ -76,8 +76,8 @@
 						<span class="focus-input100-2"></span>
 					</div>
 					<div class="wrap-input100 rs1" style="margin-top:10px;">
-						<select class="input100 sel form-control form-control-lg" type="select" name="select" placeholder="Password" required>
-						  <option value="" disabled selected>Your post</option>
+						<select class="input100 sel form-control form-control-lg" type="select" name="post" placeholder="Password" required>
+						  <option value="" disabled selected>Your Post</option>
 						  <option value="chief">Department Chief</option>
 						  <option value="officer">Officer</option>
 						  <option value="operator">Computer Operator</option>
@@ -88,6 +88,7 @@
 							Sign Up
 						</button>
 					</div>
+					<p class="text-center" id="err" style=" margin-top:25px; display:none;"></p>
 					</form>
 				   </div>
 

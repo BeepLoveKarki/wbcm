@@ -36,3 +36,8 @@ let arrivedSchema=new mongoose.Schema({
     type:Number  
   }
 });
+
+let pending=mongoose.model("pending",pendingSchema);
+let arrived=mongoose.model("arrived",arrivedSchema);
+
+module.exports={pending,arrived};
