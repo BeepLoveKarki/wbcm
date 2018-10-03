@@ -51,5 +51,11 @@ clientSchema.statics.findbypost=function(office,postname,callback){
   });
 }
 
+clientSchema.statics.findbyusername=function(name,callback){
+   this.findOne({username:name},(err,result)=>{
+	  callback(result);
+  });
+}
+
 let client=mongoose.model("client",clientSchema);
 module.exports=client;

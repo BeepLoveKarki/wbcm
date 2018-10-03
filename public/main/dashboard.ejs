@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dashboard | WBCM</title>
+    <link href="/static/vendor/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/scrolling-nav.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<script src="/static/vendor/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap.min.js"></script>
+    <script src="/static/vendor/jquery.easing.min.js"></script>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/">Web Based Customs Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#">About</a>
+            </li>
+			<li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/signout">Sign Out</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <header class="head text-white">
+      <div class="container h-content text-center">
+         <h1><%=office%></h1>
+		 <br/>
+         <h3><%=name%></h3>
+		<%if(post=="chief"){%>
+		  <h4 id="mm">Department Chief</h4>
+		<%}else if(post=="officer"){%>
+		   <h4 id="mm">Officer</h4>
+		<%}else{%>
+		   <h4 id="mm">Computer Operator</h4>
+		<%}%>
+		<br/>
+      </div>
+    </header>
+   
+    <section class="choose text-center">
+	   <h5 id="seedata">Choose from the following categories dropdown to view or manipulate goods data</h5>
+	  
+	  <form class="category">
+	  
+	   <select name="group" id="group" class="form-control center-block"  style="width:50%; margin-top:30px; margin-left:auto; margin-right:auto;" required>
+	     <option value="" disabled selected>Please select type of group</option>
+	     <option value="individual">Individual</option>
+		 <option value="corporate">Corporate</option>
+	   </select>
+	   
+	   <select name="goods" id="goods" class="form-control" style="width:50%; margin-top:20px; margin-left:auto;margin-right:auto;" required>
+	     <option value="" disabled selected>Please select type of goods</option>
+	     <option value="pending">Pending</option>
+		 <option value="arrived">Arrived</option>
+	   </select>
+	   
+	   <select name="barcode" id="barcode" class="form-control" style="width:50%; margin-top:20px; margin-bottom:20px; margin-left:auto;margin-right:auto;" required>
+	     <option value="" disabled selected>Please select barcode category</option>
+	     <option value="barcode">Barcode</option>
+		 <option value="nobarcode">No barcode</option>
+	   </select>
+	   
+	   <button class="btn btn-info" type="submit">Done</button>
+	   
+	  </form>
+	  <button class="btn btn-warning" type="button" onclick="newgood()" style="color:white; margin-top:20px;">Add New Good</button>
+	</section>
+	
+	<section class="choose text-center" style="margin-top:-250px;">
+	   <hr>
+	   
+	   <div class="table-responsive ttable-data" style="height:525px; display:none;">
+          <h5>Tax Rate Data</h5>
+		  <button class="btn btn-primary" type="button" onclick="backtax()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table" style="border:none;">
+			<thead>
+               <tr>
+               <td>Good Type</td>
+               <td>Individual Tax</td>
+               <td>Corporate Tax</td>
+               </tr>
+            </thead>
+            <tbody id="ttable">
+			</tbody>
+		  </table>
+	  </div>
+	   
+	   <div class="intu">
+	   <h5 style="margin-top:40px;"> Please refer below buttons for tax analysis</h5>
+	   <button type="button" class="btn btn-danger" type="button" onclick="gettax()" style="margin-bottom:30px; margin-top:30px;">View Tax Report</button><br/>
+	   <button type="button" class="btn btn-success" type="button" onclick="addtax()">Add New Tax Data</button>
+	   </div>
+	</section>
+	
+	  <div class="modal fade" id="nope" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
+		<div class="modal fade" id="nope1" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee1"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" onclick="window.location.reload()">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
+		<div class="modal fade" id="nope2" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee2"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" onclick="wowo()">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
+		<div class="modal fade" id="newgood">
+                <div class="modal-dialog modal-lg" style="height:450px;" id="f1">
+                    <div class="modal-content" id="shadow">
+                        <div class="modal-header"><span style="font-size:18px; margin:auto;" id="headis0">Add New Good</span></div>
+                        <div class="modal-body text-center" id="overflowControl">
+                            
+                            <div class="row" id="addGood">
+                                <form role="form text-center" method='POST' id="gform">
+                                    <input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:100%"/>
+                                    <input type="text" name="name" class="form-control" id="z2" style="margin-top:10px;  margin-left:10px;" placeholder="Enter Good Name"  required/>
+                                    <select class="form-control" type="select" style="margin-top:10px;  margin-left:10px;" name="type" required>
+						               <option value="" disabled selected>Select Goods Type</option>
+						               <option value="clothing">Clothing</option>
+                                       <option value="books">Books</option>									   
+                                     </select>
+									 <input type="number" name="price" class="form-control" id="z3" placeholder="Enter Good Price"  style="margin-top:10px;  margin-left:10px;" required/>
+									 <input type="text" name="departuredate" class="form-control" id="z4" placeholder="Enter Departure Date"  style="margin-top:10px;  margin-left:10px;" required/>
+									 <input type="text" name="departuretime" class="form-control" id="z5" placeholder="Enter Departure Time"  style="margin-top:10px;  margin-left:10px;" required/>
+									 <input type="text" name="exportcompany" class="form-control" id="z6" placeholder="Enter Export Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px;"/>
+									 <input type="text" name="importcompany" class="form-control" id="z7" placeholder="Enter Import Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px;"/>
+									 <select class="form-control" id="arrived" style="margin-top:10px;  margin-left:10px;" name="arrived" required>
+									   <option value="" disabled selected>Has good arrived?</option>
+						               <option value="yes">Yes</option>
+                                       <option value="no">No</option>		
+									 </select>
+									 
+									 <div class="arr" style="display:none;">
+									   <input type="text" name="arrivaldate" class="form-control" id="z10" placeholder="Enter Arrival Date"  style="margin-top:10px;  margin-left:10px;" />
+									   <input type="text" name="arrivaltime" class="form-control" id="z11" placeholder="Enter Arrival Time"  style="margin-top:10px;  margin-left:10px;" />
+									 </div>
+									 
+									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds" style="margin-top:10px;">Add</button>
+                                </form>
+                            </div>
+                        
+						</div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+			
+			
+			<div class="modal fade" id="newtax">
+                <div class="modal-dialog modal-lg" style="height:250px;" id="f1">
+                    <div class="modal-content" id="shadow">
+                        <div class="modal-header"><span style="font-size:18px; margin:auto;" id="headis1">Add New Tax Data</span></div>
+                        <div class="modal-body text-center" id="overflowControl">
+                            
+                            <div class="row" id="addTax">
+                                <form role="form text-center" method='POST' id="tform">
+                                     <input type="text" name="type" class="form-control" id="y1" style="margin-top:10px;  margin-left:10px;" placeholder="Enter Good Type Name"  required/>
+									 <input type="number" name="i-tax" class="form-control" id="y2" placeholder="Enter Tax Rate for individual"  style="margin-top:10px;  margin-left:10px;" required/>
+									 <input type="number" name="c-tax" class="form-control" id="y3" placeholder="Enter Tax Rate for group"  style="margin-top:10px;  margin-left:10px;" required/>
+									 <button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds1" style="margin-top:10px;">Add</button>
+                                </form>
+                            </div>
+                        
+						</div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+
+    
+    <script src="/static/js/dashboard.js"></script>
+    
+  </body>
+
+</html>

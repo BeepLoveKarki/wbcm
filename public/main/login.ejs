@@ -9,6 +9,7 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/util.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
 	<script src="/static/vendor/jquery.min.js"></script>
+	<script src="/static/vendor/bootstrap.min.js"></script>
 </head>
 <body>
 	
@@ -21,15 +22,15 @@
 					</div>
                    
 				   <div class="sin">
-				   <form class="login100-form validate-form">
+				   <form class="login100-form validate-form signin">
 					<div class="wrap-input100" style="margin-top:20px;">
-						<input class="input100" type="text" name="user" placeholder="Username" required>
+						<input class="input100" type="text" name="username" placeholder="Username" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
 
 					<div class="wrap-input100 rs1 ">
-						<input class="input100" type="password" name="pass" placeholder="Password" required>
+						<input class="input100" type="password" name="password" placeholder="Password" required>
 						<span class="focus-input100-1"></span>
 						<span class="focus-input100-2"></span>
 					</div>
@@ -39,7 +40,7 @@
 							Sign In
 						</button>
 					</div>
-					
+					<p class="text-center" id="err1" style=" margin-top:25px; display:none;"></p>
 					</form>
 					</div>
 					
@@ -116,6 +117,16 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="modal fade" id="created" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee">Your account has been created successfully. You may now sign in.</h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" onclick="yoyo()">OK</button></div>
+                    </div>
+              </div>
+        </div>
+	
   <script type="text/javascript" src="/static/js/login.js"></script>
 </body>
 </html>

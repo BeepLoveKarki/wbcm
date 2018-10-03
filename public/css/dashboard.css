@@ -1,0 +1,14 @@
+.head{
+  background-color:#42aaf4;
+  height:350px;
+}
+.h-content{
+  margin-top:-45px;
+}
+#mm{
+  margin-top:20px;
+}
+
+select:hover,i:hover{
+  cursor:pointer
+}

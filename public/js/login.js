@@ -23,16 +23,16 @@ $(".signup").submit((e)=>{
    if(emailcheck($("#email").val())){
      $.post("/signup",$(".signup").serialize()).then((res)=>{
 	    let data=$.parseJSON(res);
-		if(data.exists1=="yes"){
+		if(data.exists=="yes"){
 		  $("#err").text("An account under this email address already exists");
 	      $("#err").show();
 		}
-		if(data.exists=="yes"){
+		if(data.exists1=="yes"){
 		  $("#err").text("An account of this office under the specified post already exists");
 	      $("#err").show();
 		}
 		if(data.done=="yes"){
-		
+		   $("#created").modal('show');
 		}
 	 },(err)=>{
 	 });
@@ -41,6 +41,25 @@ $(".signup").submit((e)=>{
 	 $("#err").show();
    }
 });
+
+$(".signin").submit((e)=>{
+   e.preventDefault();
+     $.post("/signin",$(".signin").serialize()).then((res)=>{
+	    let data=$.parseJSON(res);
+		if(data.exists=="no"){
+		   $("#err1").text("No account found with entered credentials");
+	       $("#err1").show();
+		}
+		if(data.exists=="yes"){
+           window.location.href="/";			
+		}
+	 });
+});
+
+function yoyo(){
+   $("#created").modal('hide');
+   showin();
+}
 
 function emailcheck(email){
 	let tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-?\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
