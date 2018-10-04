@@ -1,5 +1,31 @@
 //$("#mm").text()
-let tdata;
+let tdata,gdata,x=0,y;
+
+$.get("/goodtype").then((res)=>{
+       let data=$.parseJSON(res);
+	   if(data["types"]=="no"){
+	      $("#tgoods").append("<option id=\"mc1\" value=\"\" disabled>No any goods categories found</option>");
+	   }else{
+		  if($("#mc1").length){
+			  $("#mc1").remove();
+		  }
+		  if($("#mc2").length){
+		     $("#mc2").remove();
+		  }
+	      data["types"].forEach((val)=>{
+		     $("#tgoods").append("<option id=\"mc2\" value=\""+val+"\">"+val+"</option>");
+		  });
+	   }
+	});
+
+$(".taxc").submit((e)=>{
+   e.preventDefault();
+   $.post("/gettax",$(".taxc").serialize()).then((res)=>{
+     let datas=$.parseJSON(res);
+	 $("#jj").text("The tax for the given good at given price is Rs."+datas["tax"].toFixed(2)+" (at the rate of "+datas["rate"]+"%)");
+   });
+});
+
 $(".category").submit((e)=>{
    e.preventDefault();
    $.post("/getgoods",$(".category").serialize()).then((res)=>{
@@ -7,16 +33,191 @@ $(".category").submit((e)=>{
 	 if(datas.possible=="no"){
 	   $("#ee").text("No pending goods data can be made available for individuals");
 	   $("#nope").modal('show');
-	 }
-	 if(datas.data=="no"){
-	   $("#ee").text("No goods data found under the selected category");
+	 }else if(datas.data=="no"){
+	   $("#ee").text("No goods data are found under the selected category presently");
 	   $("#nope").modal('show');
+	 }else{
+		gdata=datas["data"];
+		if($("#goods").val()=="pending"){
+		  $("#cptable").empty();
+		 datas["data"].forEach((val,i)=>{
+		   if(val.barcode.length==0){
+		     val.barcode="-";
+		   }
+		   $("#cptable").append("<tr id=\"cpgood"+i+"\"><td style=\"text-align:center;\">"+val.barcode+"</td><td style=\"text-align:center;\">"+val.exportCompany+"\
+	       </td><td style=\"text-align:center;\">"+val.importCompany+"</td><td style=\"text-align:center;\">"+val.name+"</td>\
+		   <td style=\"text-align:center;\">"+val.goodtype+"</td><td style=\"text-align:center;\">"+val.price+"</td>\
+		   <td style=\"text-align:center;\">"+val.departureDate+"</td><td style=\"text-align:center;\">"+val.departureTime+"</td>\
+		   <td><i class=\"far fa-edit\" onclick=\"editgood("+i+")\"></i></td> \
+	       <td><i class=\"fa fa-trash\" onclick=\"deletegood("+i+")\"></i></td></tr>");
+		 });
+		 $(".yodata").hide();
+		 $(".catable-data").hide();
+		 $(".iatable-data").hide();
+		 $(".cptable-data").show();
+		}else{
+		   if($("#group").val()=="corporate"){
+		     $("#catable").empty();
+		     datas["data"].forEach((val,i)=>{
+			   if(val["pendingDetails"][0].barcode.length==0){
+			     val["pendingDetails"][0].barcode="-";
+			   }
+			 $("#catable").append("<tr id=\"cpgood"+i+"\"><td style=\"text-align:center;\">"+val["pendingDetails"][0].barcode+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].exportCompany+"\
+	           </td><td style=\"text-align:center;\">"+val["pendingDetails"][0].importCompany+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].name+"</td>\
+		       <td style=\"text-align:center;\">"+val["pendingDetails"][0].goodtype+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].price+"</td>\
+		       <td style=\"text-align:center;\">"+val["pendingDetails"][0].departureDate+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].departureTime+"</td>\
+			   <td style=\"text-align:center;\">"+val.arrivalDate+"</td><td style=\"text-align:center;\">"+val.arrivalTime+"</td>\
+			   <td style=\"text-align:center;\">"+val.taxrate+"</td><td style=\"text-align:center;\">"+val.taxamount+"</td>\
+		       <td><i class=\"far fa-edit\" onclick=\"editgood("+i+")\"></i></td> \
+	           <td><i class=\"fa fa-trash\" onclick=\"deletegood("+i+")\"></i></td></tr>");
+		    });
+		    $(".yodata").hide();
+			$(".cptable-data").hide();
+			$(".iatable-data").hide();
+		    $(".catable-data").show();
+		   }else{
+		        $("#iatable").empty();
+		        datas["data"].forEach((val,i)=>{
+			    if(val["pendingDetails"][0].barcode.length==0){
+			     val["pendingDetails"][0].barcode="-";
+			    }
+			    $("#iatable").append("<tr id=\"cpgood"+i+"\"><td style=\"text-align:center;\">"+val["pendingDetails"][0].barcode+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].name+"</td>\
+		         <td style=\"text-align:center;\">"+val["pendingDetails"][0].goodtype+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].price+"</td>\
+		         <td style=\"text-align:center;\">"+val["pendingDetails"][0].departureDate+"</td><td style=\"text-align:center;\">"+val["pendingDetails"][0].departureTime+"</td>\
+			     <td style=\"text-align:center;\">"+val.arrivalDate+"</td><td style=\"text-align:center;\">"+val.arrivalTime+"</td>\
+			     <td style=\"text-align:center;\">"+val.taxrate+"</td><td style=\"text-align:center;\">"+val.taxamount+"</td>\
+		         <td><i class=\"far fa-edit\" onclick=\"editgood("+i+")\"></i></td> \
+	             <td><i class=\"fa fa-trash\" onclick=\"deletegood("+i+")\"></i></td></tr>");
+		       });
+		       $(".yodata").hide();
+			  $(".cptable-data").hide();
+			  $(".catable-data").hide();
+		      $(".iatable-data").show();
+		   }
+		}
 	 }
    });
 });
 
+function editgood(i){
+   $("#gform").trigger('reset');
+  if($("#goods").val()=="pending"){
+    $("#z1").val(gdata[i].barcode);
+	$("#z2").val(gdata[i].name);
+	$("#z3").val(gdata[i].price);
+	$("#z4").val(gdata[i].departureDate);
+	$("#z5").val(gdata[i].departureTime);
+	$("#z6").val(gdata[i].exportCompany);
+	$("#z7").val(gdata[i].importCompany);
+	$("#arrived").val("no");
+	$.get("/goodtype").then((res)=>{
+       let data=$.parseJSON(res);
+	   if(data["types"]=="no"){
+	      $(".goodst").append("<option id=\"mc\" value=\"\" disabled>No any goods categories found</option>");
+	   }else{
+		  if($("#mc").length){
+			  $("#mc").remove();
+		  }
+		  if($("#mc1").length){
+		     $("#mc1").remove();
+		  }
+	      data["types"].forEach((val)=>{
+		     $(".goodst").append("<option id=\"mc1\" value=\""+val+"\">"+val+"</option>");
+		  });
+	   }
+	   $(".goodst").val(gdata[i].goodtype);
+	   x=1;
+	   y=i;
+	   $("#headis0").text("Edit good below");
+	   $("#adds0").text("Edit");
+	   $("#newgood").modal('show');
+	});
+  }else{
+    $("#z1").val(gdata[i]["pendingDetails"][0].barcode);
+	$("#z2").val(gdata[i]["pendingDetails"][0].name);
+	$("#z3").val(gdata[i]["pendingDetails"][0].price);
+	$("#z4").val(gdata[i]["pendingDetails"][0].departureDate);
+	$("#z5").val(gdata[i]["pendingDetails"][0].departureTime);
+	$("#z6").val(gdata[i]["pendingDetails"][0].exportCompany);
+	$("#z7").val(gdata[i]["pendingDetails"][0].importCompany);
+	$("#arrived").val("yes");
+	$.get("/goodtype").then((res)=>{
+       let data=$.parseJSON(res);
+	   if(data["types"]=="no"){
+	      $(".goodst").append("<option id=\"mc\" value=\"\" disabled>No any goods categories found</option>");
+	   }else{
+		  if($("#mc").length){
+			  $("#mc").remove();
+		  }
+		  if($("#mc1").length){
+		     $("#mc1").remove();
+		  }
+	      data["types"].forEach((val)=>{
+		     $(".goodst").append("<option id=\"mc1\" value=\""+val+"\">"+val+"</option>");
+		  });
+	   }
+	   $(".goodst").val(gdata[i]["pendingDetails"][0].goodtype);
+	   $("#z10").val(gdata[i].arrivalDate);
+	   $("#z11").val(gdata[i].arrivalTime);
+	   $(".arr").show();
+	   x=1;
+	   y=i;
+	   $("#headis0").text("Edit good below");
+	   $("#adds0").text("Edit");
+	   $("#newgood").modal('show');
+	});
+  }
+}
+
+function deletegood(i){
+  let json;
+  if($("#goods").val()=="pending"){
+    json={name:gdata[i].name};
+  }else{
+    json={name:gdata[i]["pendingDetails"][0].name};
+  }
+  $.post("/deletegood",json).then((res)=>{
+     $("#ee3").text("The selected good has been successfully deleted");
+	 $("#nope3").modal('show');
+  });
+}
+
+function yup(){
+  $("#nope3").modal('hide');
+  backgood();
+  $(".category").submit();
+}
+
+function backgood(){
+  $(".yodata").show();
+  $(".cptable-data").hide();
+  $(".catable-data").hide();
+  $(".iatable-data").hide();
+}
+
 function newgood(){
-    $("#newgood").modal('show');
+	$.get("/goodtype").then((res)=>{
+       let data=$.parseJSON(res);
+	   if(data["types"]=="no"){
+	      $(".goodst").append("<option id=\"mc\" value=\"\" disabled>No any goods categories found</option>");
+	   }else{
+		  if($("#mc").length){
+			  $("#mc").remove();
+		  }
+		  if($("#mc1").length){
+		     $("#mc1").remove();
+		  }
+	      data["types"].forEach((val)=>{
+		     $(".goodst").append("<option id=\"mc1\" value=\""+val+"\">"+val+"</option>");
+		  });
+	   }
+	   $("#gform").trigger('reset');
+	   $(".arr").hide();
+	   x=0;
+	   $("#headis0").text("Add New Good");
+	   $("#adds0").text("Add");
+	   $("#newgood").modal('show');
+	});
 }
 
 $('#arrived').on('change', function() {
@@ -29,16 +230,30 @@ $('#arrived').on('change', function() {
 });
 
 $("#gform").submit((e)=>{
+  let fdata=$("#gform").serialize();
   e.preventDefault();
-  $.post("/newgood",$("#gform").serialize()).then((res)=>{
+  if(x==1){
+     if($("#goods").val()=="pending"){
+	   fdata+="&oldones="+gdata[y].name;
+	 }else{
+		fdata+="&oldones="+gdata[y]["pendingDetails"][0].name;
+	 }
+  }
+  $.post("/newgood",fdata).then((res)=>{
      let data=$.parseJSON(res);
 	 if(data.status=="done"){
 	   $("#newgood").modal('hide');
-	   $("#ee").text("Good has been successfully added");
-	   $("#nope").modal('show');
+	   if(x==1){
+		 $("#ee3").text("Good has been successfully edited");
+	     $("#nope3").modal('show');
+	   }else{
+	     $("#ee").text("Good has been successfully added");
+	     $("#nope").modal('show');
+	   }
 	 }
   });
 });
+
 
 $("#tform").submit((e)=>{
   e.preventDefault();

@@ -52,6 +52,83 @@
     </header>
    
     <section class="choose text-center">
+	   
+	   <div class="table-responsive cptable-data" style="height:525px; display:none;">
+          <h5>Corporate Pending Goods Data</h5>
+		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table">
+			<thead>
+               <tr>
+               <td>Bar Code</td>
+               <td>Export Company</td>
+               <td>Import Company</td>
+			   <td>Good Name</td>
+			   <td>Good Type</td>
+			   <td>Price</td>
+			   <td>Departure Date</td>
+			   <td>Departure Time</td>
+			   <td></td>
+			   <td></td>
+               </tr>
+            </thead>
+            <tbody id="cptable">
+			</tbody>
+		  </table>
+	  </div>
+	  
+	  <div class="table-responsive catable-data" style="height:525px; display:none;">
+          <h5>Corporate Arrived Goods Data</h5>
+		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table">
+			<thead>
+               <tr>
+               <td>Bar Code</td>
+               <td>Export Company</td>
+               <td>Import Company</td>
+			   <td>Good Name</td>
+			   <td>Good Type</td>
+			   <td>Price</td>
+			   <td>Departure Date</td>
+			   <td>Departure Time</td>
+			   <td>Arrival Date</td>
+			   <td>Arrival Time</td>
+			   <td>Tax Rate</td>
+			   <td>Tax Amount</td>
+			   <td></td>
+			   <td></td>
+               </tr>
+            </thead>
+            <tbody id="catable">
+			</tbody>
+		  </table>
+	  </div>
+	  
+	  <div class="table-responsive iatable-data" style="height:525px; display:none;">
+          <h5>Individual Arrived Goods Data</h5>
+		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table">
+			<thead>
+               <tr>
+               <td>Bar Code</td>
+			   <td>Good Name</td>
+			   <td>Good Type</td>
+			   <td>Price</td>
+			   <td>Departure Date</td>
+			   <td>Departure Time</td>
+			   <td>Arrival Date</td>
+			   <td>Arrival Time</td>
+			   <td>Tax Rate</td>
+			   <td>Tax Amount</td>
+			   <td></td>
+			   <td></td>
+               </tr>
+            </thead>
+            <tbody id="iatable">
+			</tbody>
+		  </table>
+	  </div>
+	
+	<div class="yodata">
 	   <h5 id="seedata">Choose from the following categories dropdown to view or manipulate goods data</h5>
 	  
 	  <form class="category">
@@ -78,6 +155,7 @@
 	   
 	  </form>
 	  <button class="btn btn-warning" type="button" onclick="newgood()" style="color:white; margin-top:20px;">Add New Good</button>
+	</div>
 	</section>
 	
 	<section class="choose text-center" style="margin-top:-250px;">
@@ -92,6 +170,8 @@
                <td>Good Type</td>
                <td>Individual Tax</td>
                <td>Corporate Tax</td>
+			   <td></td>
+			   <td></td>
                </tr>
             </thead>
             <tbody id="ttable">
@@ -101,9 +181,28 @@
 	   
 	   <div class="intu">
 	   <h5 style="margin-top:40px;"> Please refer below buttons for tax analysis</h5>
-	   <button type="button" class="btn btn-danger" type="button" onclick="gettax()" style="margin-bottom:30px; margin-top:30px;">View Tax Report</button><br/>
-	   <button type="button" class="btn btn-success" type="button" onclick="addtax()">Add New Tax Data</button>
+	   <button type="button" class="btn btn-danger" onclick="gettax()" style="margin-bottom:30px; margin-top:30px;">View Tax Report</button><br/>
+	   <button type="button" class="btn btn-success" onclick="addtax()">Add New Tax Data</button>
 	   </div>
+	</section>
+	
+	<section class="calculate text-center" style="margin-top:-250px;">
+	 <hr>
+	  <h5 style="margin-top:40px;"> Please refer below for manual tax calculation</h5>
+	  <form class="taxc">
+	  <select name="good" id="tgoods" class="form-control center-block"  style="width:50%; margin-top:30px; margin-left:auto; margin-right:auto;" required>
+	     <option value="" disabled selected>Please select type of good</option>
+	   </select>
+	   <select name="group" id="group" class="form-control center-block"  style="width:50%; margin-top:20px; margin-left:auto; margin-right:auto;" required>
+	     <option value="" disabled selected>Please select type of group</option>
+	     <option value="individual">Individual</option>
+		 <option value="corporate">Corporate</option>
+	   </select>
+	  <input type="number" name="price"  class="form-control" id="h1" placeholder="Enter Good Price" style="width:50%; margin-top:20px; margin-left:auto;margin-right:auto;"/>
+	   <p style="margin-top:25px;" id="jj"></p>
+	   <button type="submit" class="btn btn-primary" style="margin-top:5px;">Calculate Tax</button>
+	   
+	 </form>
 	</section>
 	
 	  <div class="modal fade" id="nope" tabindex="-1" style="margin-top:30px;">
@@ -133,6 +232,24 @@
               </div>
         </div>
 		
+		<div class="modal fade" id="nope3" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee3"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" onclick="yup()">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
+		<div class="modal fade" id="nope4" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee4"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" onclick="doit()">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
 		<div class="modal fade" id="newgood">
                 <div class="modal-dialog modal-lg" style="height:450px;" id="f1">
                     <div class="modal-content" id="shadow">
@@ -141,12 +258,11 @@
                             
                             <div class="row" id="addGood">
                                 <form role="form text-center" method='POST' id="gform">
-                                    <input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:100%"/>
+                                   
+									<input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:100%"/>
                                     <input type="text" name="name" class="form-control" id="z2" style="margin-top:10px;  margin-left:10px;" placeholder="Enter Good Name"  required/>
-                                    <select class="form-control" type="select" style="margin-top:10px;  margin-left:10px;" name="type" required>
-						               <option value="" disabled selected>Select Goods Type</option>
-						               <option value="clothing">Clothing</option>
-                                       <option value="books">Books</option>									   
+                                    <select class="form-control goodst" type="select" style="margin-top:10px;  margin-left:10px;" name="type" required>
+						               <option value="" disabled selected>Select Goods Type</option>									   
                                      </select>
 									 <input type="number" name="price" class="form-control" id="z3" placeholder="Enter Good Price"  style="margin-top:10px;  margin-left:10px;" required/>
 									 <input type="text" name="departuredate" class="form-control" id="z4" placeholder="Enter Departure Date"  style="margin-top:10px;  margin-left:10px;" required/>
@@ -164,7 +280,7 @@
 									   <input type="text" name="arrivaltime" class="form-control" id="z11" placeholder="Enter Arrival Time"  style="margin-top:10px;  margin-left:10px;" />
 									 </div>
 									 
-									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds" style="margin-top:10px;">Add</button>
+									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds0" style="margin-top:10px;">Add</button>
                                 </form>
                             </div>
                         
@@ -174,7 +290,7 @@
                 </div>
             </div>
 			
-			
+		
 			<div class="modal fade" id="newtax">
                 <div class="modal-dialog modal-lg" style="height:250px;" id="f1">
                     <div class="modal-content" id="shadow">

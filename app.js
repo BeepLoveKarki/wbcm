@@ -35,7 +35,6 @@ app.get('/',(req,res)=>{
     res.render('login.ejs');
   }else{
 	client.findbyusername(req.session["username"],(result)=>{
-      console.log(result);
 	  res.render('dashboard.ejs',{office:result["officeName"],name:result["name"],post:result["post"]});
 	});
   }
@@ -97,17 +96,17 @@ app.post("/getgoods",(req,res)=>{
 	    res.send(JSON.stringify({possible:"no"}));
 	  }else{
 	     if(req.body["barcode"]=="barcode"){
-		   arrived.withbarcode(res); 
+		   arrived.withbarcode2(res); 
 		 }else{
-		   arrived.withnobarcode(res);
+		   arrived.withnobarcode2(res);
 		 }
 	  }
   }else{
       if(req.body["goods"]=="pending"){
 	    if(req.body["barcode"]=="barcode"){
-		   pending.withbarcode(res);
+		   arrived.withbarcode1(res);
 		 }else{
-		   pending.withnobarcode(res);
+		   arrived.withnobarcode1(res);
 		 }
 	  }else{
 	     if(req.body["barcode"]=="barcode"){
@@ -120,13 +119,59 @@ app.post("/getgoods",(req,res)=>{
   
 });
 
+app.post("/deletegood",(req,res)=>{
+  arrived.deleteOne({"pendingDetails.name":req.body["name"]},(err,result)=>{
+    if(err) console.log(err);
+	res.send(JSON.stringify({status:"done"}));
+  });
+});
+
+app.post("/barcode",(req,res)=>{ //barcode scanning
+  //req.body["barcode"], req.body["date"], req.body["time"]
+  arrived.pendtoarrive(req.body["barcode"],req.body["date"],req.body["time"],res);
+});
+
+app.post("/gettax",(req,res)=>{
+  let taxm,taxr;
+  tax.findOne({goodtype:req.body["good"]},(err,result)=>{
+    if(req.body["group"]="individual"){
+	   taxm=(result["itax"]/100)*Number(req.body["price"]);
+	   taxr=result["itax"];
+	}else{
+	   taxm=(result["ctax"]/100)*Number(req.body["price"]);
+	   taxr=result["ctax"];
+	}
+	res.send(JSON.stringify({tax:taxm,rate:taxr}));
+  });
+});
+
 app.post("/newgood",(req,res)=>{
-  let pendings=new pending({barcode:req.body["barcode"],name:req.body["name"],goodtype:req.body["type"],price:req.body["price"],departureTime:req.body["departuretime"],
-  departureDate:req.body["departuredate"],importCompany:req.body["importcompany"],exportCompany:req.body["exportcompany"]});
-  let arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"]});
-  arriveds.pendingDetails.push(pendings);
-  arriveds.save().then((err,doc)=>{
-     res.send(JSON.stringify({status:"done"}));
+  let arriveds;
+  tax.findOne({goodtype:req.body["type"]},(err,result)=>{
+	let pendings=new pending({barcode:req.body["barcode"],name:req.body["name"],goodtype:req.body["type"],price:req.body["price"],departureTime:req.body["departuretime"],
+    departureDate:req.body["departuredate"],importCompany:req.body["importcompany"],exportCompany:req.body["exportcompany"]});
+	
+	if(req.body["importcompany"].length==0 && req.body["exportcompany"].length==0){
+      let amt=(result["itax"]/100)*req.body["price"];
+	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["itax"],taxamount:amt});
+	}else{
+	  let amt=(result["ctax"]/100)*req.body["price"];
+	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["ctax"],taxamount:amt});
+	}
+	
+	if(req.body["oldones"]){
+	   arrived.deleteOne({"pendingDetails.name":req.body["oldones"]},(err,result)=>{
+	      arriveds.pendingDetails.push(pendings);
+          arriveds.save().then((err,doc)=>{
+              res.send(JSON.stringify({status:"done"}));
+            });
+	   });
+	}else{ 
+	    arriveds.pendingDetails.push(pendings);
+        arriveds.save().then((err,doc)=>{
+         res.send(JSON.stringify({status:"done"}));
+        });
+    }
   });
 });
 
@@ -139,6 +184,20 @@ app.post("/newtax",(req,res)=>{
    }else{
      saveit(taxes,res);
    }
+});
+
+app.get("/goodtype",(req,res)=>{
+  let types=new Array();
+  tax.find({},(err,result)=>{
+     if(result.length==0){
+	    res.send(JSON.stringify({types:"no"}));
+	 }else{
+	  result.forEach((val)=>{
+	     types.push(val["goodtype"]);
+	  });
+       res.send(JSON.stringify({types:types}));	  
+	 }
+  });
 });
 
 function saveit(taxes,res){
