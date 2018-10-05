@@ -14,22 +14,6 @@ let session = require('express-session');
 let MongoStore = require('connect-mongo')(session);
 let data;
 let adbs = require("ad-bs-converter");
-let plotly = require('plotly')({"username": "beeplove", "apiKey": "upXuDEOP2xztvW4h59LF"});
-
-let data1 = [{x:[0,1,2], y:[3,2,1], type: 'bar'}];
-
-var imgOpts = {
-    format: 'png',
-    width: 1000,
-    height: 500
-};
-
-plotly.getImage(data1, imgOpts, function (error, imageStream) {
-    if (error) return console.log (error);
-
-    var fileStream = fs.createWriteStream('1.png');
-    imageStream.pipe(fileStream);
-});
 
 let options={
   url:'mongodb://localhost:27017/wbcm-sessions'
@@ -308,6 +292,26 @@ app.get("/getit",(req,res)=>{
   let month=adbs.ad2bs(sdate)["en"]["strMonth"];
   let year=adbs.ad2bs(sdate)["en"]["year"];
   res.send(JSON.stringify({year:year,month:month}));
+});
+
+app.get("/taxes",(req,res)=>{
+   let itax=new Array();
+   let ctax=new Array();
+   let dates=new Array();
+   yreport.find({},(err,result)=>{
+      if(result.length==0){
+	      res.send(JSON.stringify({data:"no"}));
+	  }else{
+		result.forEach((val1)=>{
+	     val1["monthdata"].forEach((val)=>{
+		     itax.push(val["itax"]);
+			 ctax.push(val["ctax"]);
+			 dates.push(val["month"]+"-"+val1["year"]);
+		 });
+		});
+		res.send(JSON.stringify({itax:itax,ctax:ctax,dates:dates}));
+	  }
+   });
 });
 
 app.post("/settarget",(req,res)=>{

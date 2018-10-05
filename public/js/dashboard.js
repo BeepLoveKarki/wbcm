@@ -220,10 +220,12 @@ function newgood(){
 	});
 }
 
+let rh;
 $.get("/getit").then((res)=>{
    let data=$.parseJSON(res);
+   rh=data["year"];
    $("#target").text("Please set target for month "+data["month"]+" of fiscal year "+data["year"]);
-   $("#mmd").text("Report for fiscal year "+data["year"]);
+   $("#mmd").text("Tabular Report");
 });
 
 $("#sform").submit((e)=>{
@@ -243,7 +245,7 @@ function reporttable(){
    $.get("/reportdata").then((res)=>{
      let data=$.parseJSON(res);
 	 if(data["data"]=="no"){
-	   $("#ee").text("No data found for report analysis");
+	   $("#ee").text("No data found for tabular analysis");
 	   $("#nope").modal('show');
 	 }else if(data["target"]=="no"){
 	   $("#ee").text("Please set at least one fiscal year (month) target amount to view report");
@@ -259,7 +261,7 @@ function reporttable(){
 		    tamt="-";
 			gap="-";
 		  }
-		  $("#rtable").append("<tr id=\"report"+i+"\"><td style=\"text-align:center;\">"+val+"</td><td style=\"text-align:center;\">"+data["itax"][i]+"</td>\
+		  $("#rtable").append("<tr id=\"report"+i+"\"><td style=\"text-align:center;\">"+val+"-"+rh+"</td><td style=\"text-align:center;\">"+data["itax"][i]+"</td>\
 		  <td style=\"text-align:center;\">"+data["ctax"][i]+"</td><td style=\"text-align:center;\">"+(data["itax"][i]+data["ctax"][i])+"</td>\
 		  <td style=\"text-align:center;\">"+tamt+"</td><td style=\"text-align:center;\">"+gap+"</td</tr>");
 		});
@@ -270,13 +272,50 @@ function reporttable(){
 }
 
 
+
 function backreport(){
    $(".rtable-data").hide();
+   $("#plotly_div").hide();
    $(".reporta").show();
 }
 
 function graph(){
-
+ $.get("/taxes").then((res)=>{
+  let data=$.parseJSON(res);
+  if(data["data"]=="no"){
+    $("#ee").text("No data found for graphical analysis");
+	$("#nope").modal('show');
+  }else{
+	let d=$.parseJSON(res);
+    let d3 = Plotly.d3;
+    let img_jpg= d3.select('#graph');
+    let trace={x:d["dates"],y:d["itax"],name:"Individual tax",type:"bar"};
+    let trace1={x:d["dates"],y:d["ctax"],name:"Corporate tax",type:"bar"};
+    let data = [trace,trace1];
+    let layout = {
+	 title : "Graph Report",
+    }
+   Plotly.newPlot(
+   'plotly_div',
+    data,
+    layout)
+    .then(
+     function(gd)
+     {
+      Plotly.toImage(gd,{height:600,width:800})
+         .then(
+            function(url)
+         {
+             img_jpg.attr("src", url);
+             return Plotly.toImage(gd,{format:'jpeg',height:400,width:400});
+         }
+         )
+    });
+    $("#plotly_div").show();
+    $(".rtable-data").hide();
+    $(".reporta").hide();
+  }
+ });
 }
 
 $('#arrived').on('change', function() {

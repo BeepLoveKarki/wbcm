@@ -12,3 +12,7 @@
 select:hover,i:hover{
   cursor:pointer
 }
+
+.modebar-btn,.svg-container{
+  display:none !important;
+}

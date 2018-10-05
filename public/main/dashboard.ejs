@@ -12,6 +12,7 @@
 	<script src="/static/vendor/jquery.min.js"></script>
     <script src="/static/vendor/bootstrap.min.js"></script>
     <script src="/static/vendor/jquery.easing.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
 
   <body>
@@ -214,7 +215,7 @@
 		  <table class="table" style="border:none;">
 			<thead>
                <tr>
-               <td>Month</td>
+               <td>Period</td>
                <td>Individual</td>
                <td>Corporate</td>
 			   <td>Total</td>
@@ -226,11 +227,16 @@
 			</tbody>
 		  </table>
 	  </div>
+	  
+	  <div id="plotly_div" style="display:none;">
+	    <button class="btn btn-primary" type="button" onclick="backreport()" style="margin-top:20px; margin-bottom:20px;">Go Back</button></br>
+	    <img id="graph"></img>
+	  </div>
 	 
     <div class="reporta">	 
-	  <h5 style="margin-top:40px;"> Please refer below for report analysis</h5>
-	  <button type="button" class="btn btn-warning" onclick="reporttable()" style="margin-bottom:30px; margin-top:30px; color:white;">View Tabular Data</button><br/>
-	   <button type="button" class="btn btn-primary" onclick="graph()">View Graphical Data</button>
+	  <h5 style="margin-top:40px;" id="cc"> Please refer below for report analysis</h5>
+	  <button type="button" class="btn btn-warning" onclick="reporttable()" style="margin-bottom:30px; margin-top:30px; color:white;">View Tabular Report</button><br/>
+	   <button type="button" class="btn btn-primary" onclick="graph()">View Graphical Report</button>
 	</div>
 	</section>
 	
