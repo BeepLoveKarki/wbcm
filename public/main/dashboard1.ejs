@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Dashboard | WBCM</title>
+    <link href="/static/vendor/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/scrolling-nav.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<script src="/static/vendor/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap.min.js"></script>
+    <script src="/static/vendor/jquery.easing.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+  
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="/">Web Based Customs Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+			<li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="/adminsignout">Admin Sign Out</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+	
+	<header class="head text-white">
+      <div class="container h-content text-center">
+         <h1>Central Custom Department</h1>
+		 <br/>
+         <h3>Admin Privilege</h3>
+		  <h4 id="mm">National Customs Management</h4>
+		<br/>
+      </div>
+    </header>
+	
+	<section class="employing text-center" style="margin-top:-168px;">
+	 <hr>
+	 
+	 <div class="table-responsive ptable-data" style="height:525px; display:none;">
+          <h5 id="mmd"></h5>
+		  <button class="btn btn-primary" type="button" onclick="backemployee()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table" style="border:none;">
+			<thead>
+               <tr style="font-weight:500;">
+               <td>Office Name</td>
+               <td>Employee Name</td>
+               <td>Post</td>
+			   <td>License Number</td>
+			   <td>Email Address</td>
+               </tr>
+            </thead>
+            <tbody id="ptable">
+			</tbody>
+		  </table>
+	  </div>
+	  
+	 
+    <div class="employees">	 
+	  <h5 style="margin-top:40px;" id="cc"> Please refer below for users data</h5>
+	  <button type="button" class="btn btn-warning" onclick="viewuser()" style="margin-bottom:30px; margin-top:30px; color:white;">View Existing Users</button><br/>
+	   <button type="button" class="btn btn-primary" onclick="adduser()">Add New User</button>
+	</div>
+	</section>
+	
+	<section class="reporting text-center" style="margin-top:-250px;">
+	 <hr>
+	 
+	 <div class="table-responsive rtable-data" style="height:525px; display:none;">
+          <h5 id="mmd"></h5>
+		  <button class="btn btn-primary" type="button" onclick="backreport()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table" style="border:none;">
+			<thead>
+               <tr style="font-weight:500;">
+               <td>Office Name</td>
+               <td>Individual Tax</td>
+			   <td>Corporate Tax</td>
+			   <td>Total</td>
+               </tr>
+            </thead>
+            <tbody id="rtable">
+			</tbody>
+		  </table>
+	  </div>
+	  
+	  <div id="plotly_div" style="display:none;">
+	    
+	    <button class="btn btn-primary" type="button" onclick="backreport()" style="margin-top:20px; margin-bottom:20px;">Go Back</button></br>
+	    <img id="graph"></img>
+	  </div>
+	 
+    <div class="reporta">	 
+	  <h5 style="margin-top:40px;" id="cc"> Please refer below for report analysis</h5>
+	   <input class="form-control" id="an" type="number" name="year" placeholder="Enter Year To Analyze" style="margin-top:30px; margin-left:auto; margin-right:auto; width:50%" required>
+	  <button type="button" class="btn btn-warning" onclick="reporttable()" style="margin-bottom:30px; margin-top:30px; color:white;">View Tabular Report</button><br/>
+	   <button type="button" class="btn btn-primary" onclick="graph()">View Graphical Report</button>
+	</div>
+	</section>
+	
+	
+	
+	
+	<div class="modal fade" id="nope" tabindex="-1" style="margin-top:30px;">
+                <div class="modal-dialog" style="height:450px;" id="f13">
+                    <div class="modal-content">
+                        <div class="modal-header"><h5 style="margin-top:20px;" id="ee"></h5></div>          
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">OK</button></div>
+                    </div>
+              </div>
+        </div>
+		
+		<div class="modal fade" id="newuser">
+                <div class="modal-dialog modal-lg" style="height:250px;" id="f1">
+                    <div class="modal-content" id="shadow">
+                        <div class="modal-header"><span style="font-size:18px; margin:auto;" id="headis1">Add New User</span></div>
+                        <div class="modal-body text-center" id="overflowControl">
+                            
+                            <div class="row" id="adduser">
+                                <form role="form text-center" method='POST' id="uform" style="width:100%;">
+                                     <input class="form-control" type="text" name="name" placeholder="Name" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" type="text" name="license" placeholder="License Number" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" type="text" name="office" placeholder="Office Name" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" type="text" name="email" placeholder="Email Address" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" type="text" name="username" placeholder="Username" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" type="password" name="password" placeholder="Password" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <select class="form-control" type="select" style="margin-top:10px; margin-left:10px; width:95%" name="post" required>
+						               <option value="" disabled selected>Post</option>
+						               <option value="chief">Department Chief</option>
+						               <option value="officer">Officer</option>
+						               <option value="operator">Computer Operator</option>
+						            </select>
+									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds1" style="margin-top:10px;">Add</button>
+                                </form>
+                            </div>
+						</div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+	
+	
+  <script src="/static/js/dashboard1.js"></script>
+  
+  </body>
+  </html>

@@ -9,6 +9,9 @@ let taxSchema=new mongoose.Schema({
   },
   ctax:{
     type:Number  
+  },
+  officeName:{
+    type:String
   }
 });
 

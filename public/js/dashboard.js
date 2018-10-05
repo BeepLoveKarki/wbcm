@@ -225,7 +225,6 @@ $.get("/getit").then((res)=>{
    let data=$.parseJSON(res);
    rh=data["year"];
    $("#target").text("Please set target for month "+data["month"]+" of fiscal year "+data["year"]);
-   $("#mmd").text("Tabular Report");
 });
 
 $("#sform").submit((e)=>{
@@ -241,8 +240,22 @@ function setit(){
    $("#targetit").modal('show');
 }
 
+function edituser(){
+   $.get("/allinfo").then((res)=>{
+      let data=$.parseJSON(res);
+	  $("#o1").val(data["data"]["name"]);
+	  $("#o2").val(data["data"]["license"]);
+	  $("#o3").val(data["data"]["officeName"]);
+	  $("#o4").val(data["data"]["email"]);
+	  $("#o5").val(data["data"]["username"]);
+	  $("#o7").val(data["data"]["post"]);
+	  $("#edituser").modal('show');
+   });
+}
+
 function reporttable(){
-   $.get("/reportdata").then((res)=>{
+  if($("#an").val().length!=0){
+   $.post("/reportdata",{year:$("#an").val()}).then((res)=>{
      let data=$.parseJSON(res);
 	 if(data["data"]=="no"){
 	   $("#ee").text("No data found for tabular analysis");
@@ -263,12 +276,17 @@ function reporttable(){
 		  }
 		  $("#rtable").append("<tr id=\"report"+i+"\"><td style=\"text-align:center;\">"+val+"-"+rh+"</td><td style=\"text-align:center;\">"+data["itax"][i]+"</td>\
 		  <td style=\"text-align:center;\">"+data["ctax"][i]+"</td><td style=\"text-align:center;\">"+(data["itax"][i]+data["ctax"][i])+"</td>\
-		  <td style=\"text-align:center;\">"+tamt+"</td><td style=\"text-align:center;\">"+gap+"</td</tr>");
+		  <td style=\"text-align:center;\">"+tamt+"</td><td style=\"text-align:center;\">"+gap+"</td></tr>");
 		});
+		$("#mmd").text("Tax report for "+$("#an").val());
 		$(".rtable-data").show();
 		$(".reporta").hide();
 	 }
    });
+  }else{
+     $("#ee").text("Please input year to analyze");
+	$("#nope").modal('show');
+  }
 }
 
 
@@ -280,7 +298,8 @@ function backreport(){
 }
 
 function graph(){
- $.get("/taxes").then((res)=>{
+if($("#an").val().length!=0){
+ $.post("/taxes",{year:$("#an").val()}).then((res)=>{
   let data=$.parseJSON(res);
   if(data["data"]=="no"){
     $("#ee").text("No data found for graphical analysis");
@@ -293,7 +312,7 @@ function graph(){
     let trace1={x:d["dates"],y:d["ctax"],name:"Corporate tax",type:"bar"};
     let data = [trace,trace1];
     let layout = {
-	 title : "Graph Report",
+	 title : "Tax Report for "+$("#an").val(),
     }
    Plotly.newPlot(
    'plotly_div',
@@ -316,6 +335,10 @@ function graph(){
     $(".reporta").hide();
   }
  });
+}else{
+   $("#ee").text("Please input year to analyze");
+	$("#nope").modal('show');
+}
 }
 
 $('#arrived').on('change', function() {

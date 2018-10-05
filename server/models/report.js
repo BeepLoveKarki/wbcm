@@ -26,6 +26,9 @@ let yearreportSchema=new mongoose.Schema({
   totalctax:{
     type:Number,
 	default:0
+  },
+  officeName:{
+     type:String
   }
 });
 
@@ -38,6 +41,9 @@ let targetSchema=new mongoose.Schema({
    },
    amount:{
      type:Number
+   },
+   officeName:{
+     type:String
    }
 });
 

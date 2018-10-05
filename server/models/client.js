@@ -25,8 +25,30 @@ let clientSchema=new mongoose.Schema({
    }
 });
 
+let adminSchema=new mongoose.Schema({
+  username:{
+    type:String
+  },
+  password:{
+    type:String
+  }
+});
+
 
 clientSchema.pre('save',function(next){
+   if(this.isModified('password')){
+     bcrypt.genSalt(10,(err,salt)=>{
+	   bcrypt.hash(this.password,salt,(err,hash)=>{
+	     this.password=hash;
+		 next();
+	   });
+	 });
+   }else{
+     next();
+   }
+});
+
+adminSchema.pre('save',function(next){
    if(this.isModified('password')){
      bcrypt.genSalt(10,(err,salt)=>{
 	   bcrypt.hash(this.password,salt,(err,hash)=>{
@@ -57,5 +79,12 @@ clientSchema.statics.findbyusername=function(name,callback){
   });
 }
 
+adminSchema.statics.findbyusername=function(name,callback){
+   this.findOne({username:name},(err,result)=>{
+	  callback(result);
+  });
+}
+
 let client=mongoose.model("client",clientSchema);
-module.exports=client;
+let admin=mongoose.model("admin",adminSchema);
+module.exports={client,admin};

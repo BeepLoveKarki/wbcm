@@ -8,7 +8,7 @@ let app=express();
 let mongoose=require('./server/db/mongoose.js');
 let {pending,arrived}=require('./server/models/goods.js');
 let tax=require('./server/models/tax.js');
-let client=require('./server/models/client.js');
+let {client,admin}=require('./server/models/client.js');
 let {mreport,yreport,treport}=require('./server/models/report.js');
 let session = require('express-session');
 let MongoStore = require('connect-mongo')(session);
@@ -43,9 +43,51 @@ app.get('/',(req,res)=>{
   }
 });
 
+app.get("/admin",(req,res)=>{
+  if(!req.session || !req.session["admin"]){
+   res.render('admin.ejs');
+  }else{
+     res.render("dashboard1.ejs");
+  }
+});
+
 app.get("/signout",(req,res)=>{
    req.session.destroy(function(err) {
      res.redirect("/");
+  });
+});
+
+app.get("/allusers",(req,res)=>{
+	client.find({},(err,result)=>{
+	  if(result.length==0){
+	    res.send(JSON.stringify({status:"no"}));
+	  }else{
+	    res.send(JSON.stringify({users:result}));
+	  }
+	});
+});
+
+app.post("/allreportdata",(req,res)=>{
+  let office=new Array();
+  let itax=new Array();
+  let ctax=new Array();
+  yreport.find({year:req.body["year"]},(err,result)=>{
+     if(result.length==0){
+	   res.send(JSON.stringify({data:"no"}));
+	 }else{
+	   result.forEach((val)=>{
+	     office.push(val["officeName"]);
+		 itax.push(val["totalitax"]);
+		 ctax.push(val["totalctax"]);
+	   });
+	   res.send(JSON.stringify({office:office,itax:itax,ctax:ctax}));
+	 }
+  });
+});
+
+app.get("/adminsignout",(req,res)=>{
+   req.session.destroy(function(err) {
+     res.redirect("/admin");
   });
 });
 
@@ -81,6 +123,42 @@ app.post('/signin',(req,res)=>{
 	   bcrypt.compare(req.body["password"],result["password"]).then((res1)=>{
 		 if(res1==true){
 			req.session["username"]=req.body["username"];
+			req.session["office"]=result["officeName"];
+		    res.send(JSON.stringify({exists:"yes"}));
+		 }else{
+		   res.send(JSON.stringify({exists:"no"}));
+		 }
+	   });
+	}
+  });
+});
+
+app.post('/adminsignup',(req,res)=>{
+  admin.find({},(err,result)=>{
+    if(result.length==0){
+	  let admins=new admin({username:req.body["username"],password:req.body["password"]});
+	  admins.save().then((err,doc)=>{
+	     res.send(JSON.stringify({status:"done"}));
+	  });
+	}else{
+	  admin.remove({},(err,result)=>{
+	    let admins=new admin({username:req.body["username"],password:req.body["password"]});
+	    admins.save().then((err,doc)=>{
+	      res.send(JSON.stringify({status:"done"}));
+	    });
+	  });
+	}
+ });
+});
+
+app.post('/adminsignin',(req,res)=>{
+  admin.findbyusername(req.body["username"],(result)=>{
+	if(result==null){
+	   res.send(JSON.stringify({exists:"no"}));
+	}else{
+	   bcrypt.compare(req.body["password"],result["password"]).then((res1)=>{
+		 if(res1==true){
+			req.session["admin"]="yes";
 		    res.send(JSON.stringify({exists:"yes"}));
 		 }else{
 		   res.send(JSON.stringify({exists:"no"}));
@@ -99,23 +177,23 @@ app.post("/getgoods",(req,res)=>{
 	    res.send(JSON.stringify({possible:"no"}));
 	  }else{
 	     if(req.body["barcode"]=="barcode"){
-		   arrived.withbarcode2(res); 
+		   arrived.withbarcode2(req.session["office"],res); 
 		 }else{
-		   arrived.withnobarcode2(res);
+		   arrived.withnobarcode2(req.session["office"],res);
 		 }
 	  }
   }else{
       if(req.body["goods"]=="pending"){
 	    if(req.body["barcode"]=="barcode"){
-		   arrived.withbarcode1(res);
+		   arrived.withbarcode1(req.session["office"],res);
 		 }else{
-		   arrived.withnobarcode1(res);
+		   arrived.withnobarcode1(req.session["office"],res);
 		 }
 	  }else{
 	     if(req.body["barcode"]=="barcode"){
-		   arrived.withbarcode(res);
+		   arrived.withbarcode(req.session["office"],res);
 		 }else{
-		   arrived.withnobarcode(res);
+		   arrived.withnobarcode(req.session["office"],res);
 		 }
 	  }
   }
@@ -165,10 +243,10 @@ app.post("/newgood",(req,res)=>{
 	
 	if(req.body["importcompany"].length==0 && req.body["exportcompany"].length==0){
       amt=(result["itax"]/100)*req.body["price"];
-	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["itax"],taxamount:amt});
+	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["itax"],taxamount:amt,officeName:req.session["office"]});
 	}else{
 	  amt1=(result["ctax"]/100)*req.body["price"];
-	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["ctax"],taxamount:amt1});
+	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["ctax"],taxamount:amt1,officeName:req.session["office"]});
 	}
 	
 	if(req.body["oldones"]){
@@ -186,12 +264,12 @@ app.post("/newgood",(req,res)=>{
 		  if(result==null){
 			let yreports,mreports;
 			if(amt!=0){
-			  yreports=new yreport({year:year,totalitax:amt,monthdata:[]});
+			  yreports=new yreport({year:year,totalitax:amt,officeName:req.session["office"],monthdata:[]});
               mreports=new mreport({month:month,itax:amt});
 			  yreports.monthdata.push(mreports);
 			}
 			if(amt1!=0){
-			  yreports=new yreport({year:year,totalctax:amt1,monthdata:[]});
+			  yreports=new yreport({year:year,totalctax:amt1,officeName:req.session["office"],monthdata:[]});
               mreports=new mreport({month:month,ctax:amt1});
 			  yreports.monthdata.push(mreports);
 			}
@@ -214,8 +292,8 @@ app.post("/newgood",(req,res)=>{
 				 };
 			  }
 			  
-			  yreport.findOneAndUpdate({year:year},r,(err,result)=>{
-				  yreport.findOne({"monthdata.month":month},(err,result)=>{
+			  yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},r,(err,result)=>{
+				  yreport.findOne({"monthdata.month":month,officeName:req.session["office"]},(err,result)=>{
 					 if(result==null){
 					   result.monthdata.push(mreports);
 					   if(amt!=0){
@@ -241,7 +319,7 @@ app.post("/newgood",(req,res)=>{
 					   });
 					   result.monthdata.push(mreports1);
 					 }
-					 yreport.findOneAndUpdate({year:year},{monthdata:result.monthdata},(err,result1)=>{
+					 yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},{monthdata:result.monthdata},(err,result1)=>{
 			             arriveds.pendingDetails.push(pendings);
                            arriveds.save().then((err,doc)=>{
                                res.send(JSON.stringify({status:"done"}));
@@ -294,11 +372,11 @@ app.get("/getit",(req,res)=>{
   res.send(JSON.stringify({year:year,month:month}));
 });
 
-app.get("/taxes",(req,res)=>{
+app.post("/taxes",(req,res)=>{
    let itax=new Array();
    let ctax=new Array();
    let dates=new Array();
-   yreport.find({},(err,result)=>{
+   yreport.find({officeName:req.session["office"],year:req.body["year"]},(err,result)=>{
       if(result.length==0){
 	      res.send(JSON.stringify({data:"no"}));
 	  }else{
@@ -306,7 +384,7 @@ app.get("/taxes",(req,res)=>{
 	     val1["monthdata"].forEach((val)=>{
 		     itax.push(val["itax"]);
 			 ctax.push(val["ctax"]);
-			 dates.push(val["month"]+"-"+val1["year"]);
+			 dates.push(val["month"]);
 		 });
 		});
 		res.send(JSON.stringify({itax:itax,ctax:ctax,dates:dates}));
@@ -314,19 +392,35 @@ app.get("/taxes",(req,res)=>{
    });
 });
 
+app.get("/allinfo",(req,res)=>{
+  client.findOne({username:req.session["username"]},(err,result)=>{
+     res.send(JSON.stringify({data:result}));
+  });
+});
+
+app.post("/editit",(req,res)=>{
+  client.deleteOne({username:req.session["username"]},(err,result)=>{
+    let clients=new client({name:req.body["name"],license:req.body["license"],username:req.body["username"],password:req.body["password"],
+    officeName:req.body["office"],email:req.body["email"],post:req.body["post"]});
+	clients.save().then((err,doc)=>{
+	   res.redirect("/signout");
+	});
+  });
+});
+
 app.post("/settarget",(req,res)=>{
   let date=new Date();
   let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
   let month=adbs.ad2bs(sdate)["en"]["strMonth"];
   let year=adbs.ad2bs(sdate)["en"]["year"];
-    treport.findOne({year:year,month:month},(err,result)=>{
+    treport.findOne({year:year,month:month,officeName:req.session["office"]},(err,result)=>{
 	   if(result==null){
-	     let treports=new treport({year:year,month:month,amount:req.body["target"]});
+	     let treports=new treport({year:year,month:month,amount:req.body["target"],officeName:req.session["office"]});
 		 treports.save().then((err,doc)=>{
 		    res.send(JSON.stringify({status:"done"}));
 		 });
 	   }else{
-	      treport.findOneAndUpdate({year:year,month:month},{$set:{amount:req.body["target"]}},(err,result)=>{
+	      treport.findOneAndUpdate({year:year,month:month,officeName:req.session["office"]},{$set:{amount:req.body["target"]}},(err,result)=>{
 			 res.send(JSON.stringify({status:"done"}));
 		  });
 	   }
@@ -341,7 +435,7 @@ function saveit(taxes,res){
 
 app.get("/tax",(req,res)=>{
    let data=new Array();
-   tax.find({},(err,result)=>{
+   tax.find({officeName:req.body["officeName"]},(err,result)=>{
 	if(result.length==0){
 	   res.send(JSON.stringify({exists:"no"}));
 	}else{
@@ -350,21 +444,17 @@ app.get("/tax",(req,res)=>{
 	  });
 	  res.send(JSON.stringify({data:data}));
 	}
-  });
-   
+  }); 
 });
 
-app.get("/reportdata",(req,res)=>{
+
+app.post("/reportdata",(req,res)=>{
   let itax=new Array();
   let ctax=new Array();
   let dmonths=new Array();
   let tmonths=new Array();
   let tamt=new Array();
-  let date=new Date();	
-  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
-  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
-  let year=adbs.ad2bs(sdate)["en"]["year"];
-  yreport.findOne({year:year},(err,result)=>{
+  yreport.findOne({year:req.body["year"],officeName:req.session["office"]},(err,result)=>{
       if(result==null){
 	     res.send(JSON.stringify({data:"no"}));
 	  }else{
@@ -373,7 +463,7 @@ app.get("/reportdata",(req,res)=>{
 		   ctax.push(val["ctax"]);
 		   dmonths.push(val["month"]);
 		});
-	    treport.find({year:year},(err1,result1)=>{
+	    treport.find({year:year,officeName:req.session["office"]},(err1,result1)=>{
 	     if(result1.length==0){
 		   res.send(JSON.stringify({target:"no"}));
 		 }else{
@@ -395,8 +485,8 @@ app.post("/deletetax",(req,res)=>{
   });
 });
 
-/*app.get("*",(req,res)=>{
+app.get("*",(req,res)=>{
    res.redirect("/");
-});*/
+});
 
 app.listen(8080);

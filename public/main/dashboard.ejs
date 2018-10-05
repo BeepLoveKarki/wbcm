@@ -26,7 +26,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#">About</a>
+              <a class="nav-link js-scroll-trigger" href="#" onclick="edituser();return false;">Account</a>
             </li>
 			<li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="/signout">Sign Out</a>
@@ -59,7 +59,7 @@
 		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
 		  <table class="table">
 			<thead>
-               <tr>
+               <tr style="font-weight:500;">
                <td>Bar Code</td>
                <td>Export Company</td>
                <td>Import Company</td>
@@ -82,7 +82,7 @@
 		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
 		  <table class="table">
 			<thead>
-               <tr>
+               <tr style="font-weight:500;">
                <td>Bar Code</td>
                <td>Export Company</td>
                <td>Import Company</td>
@@ -109,7 +109,7 @@
 		  <button class="btn btn-primary" type="button" onclick="backgood()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
 		  <table class="table">
 			<thead>
-               <tr>
+               <tr style="font-weight:500;">
                <td>Bar Code</td>
 			   <td>Good Name</td>
 			   <td>Good Type</td>
@@ -167,7 +167,7 @@
 		  <button class="btn btn-primary" type="button" onclick="backtax()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
 		  <table class="table" style="border:none;">
 			<thead>
-               <tr>
+               <tr style="font-weight:500;">
                <td>Good Type</td>
                <td>Individual Tax</td>
                <td>Corporate Tax</td>
@@ -214,7 +214,7 @@
 		  <button class="btn btn-primary" type="button" onclick="backreport()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
 		  <table class="table" style="border:none;">
 			<thead>
-               <tr>
+               <tr style="font-weight:500;">
                <td>Period</td>
                <td>Individual</td>
                <td>Corporate</td>
@@ -235,6 +235,7 @@
 	 
     <div class="reporta">	 
 	  <h5 style="margin-top:40px;" id="cc"> Please refer below for report analysis</h5>
+	  <input class="form-control" id="an" type="number" name="year" placeholder="Enter Year To Analyze" style="margin-top:30px; margin-left:auto; margin-right:auto; width:50%" required>
 	  <button type="button" class="btn btn-warning" onclick="reporttable()" style="margin-bottom:30px; margin-top:30px; color:white;">View Tabular Report</button><br/>
 	   <button type="button" class="btn btn-primary" onclick="graph()">View Graphical Report</button>
 	</div>
@@ -244,6 +245,7 @@
 	 <hr>
 	  <h5 id="target" style="margin-top:40px;"></h5>
 	  <button type="button" class="btn btn-success" onclick="setit()" style="margin-bottom:30px; margin-top:30px; color:white;">Set Now</button><br/>
+	 
 	</section>
 	
 	  <div class="modal fade" id="targetit">
@@ -253,9 +255,9 @@
                         <div class="modal-body text-center" id="overflowControl">
                             
                             <div class="row" id="settarget">
-                                <form role="form text-center" method='POST' id="sform">
+                                <form role="form text-center" method='POST' id="sform" style="width:100%">
                                    
-									<input type="number" name="target"  class="form-control" id="u1" placeholder="Enter Amount" style="margin-top:30px; margin-left:10px; width:100%"/>
+									<input type="number" name="target"  class="form-control" id="u1" placeholder="Enter Amount" style="margin-top:30px; margin-left:10px; width:95%"/>
 	                                <button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="setb" style="margin-top:10px;">Set</button>
 								 </form>
 							</div>
@@ -317,27 +319,27 @@
                         <div class="modal-body text-center" id="overflowControl">
                             
                             <div class="row" id="addGood">
-                                <form role="form text-center" method='POST' id="gform">
+                                <form role="form text-center" method='POST' id="gform" style="width:100%;">
                                    
-									<input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:100%"/>
-                                    <input type="text" name="name" class="form-control" id="z2" style="margin-top:10px;  margin-left:10px;" placeholder="Enter Good Name"  required/>
-                                    <select class="form-control goodst" type="select" style="margin-top:10px;  margin-left:10px;" name="type" required>
+									<input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:95%"/>
+                                    <input type="text" name="name" class="form-control" id="z2" style="margin-top:10px;  margin-left:10px; width:95%" placeholder="Enter Good Name"  required/>
+                                    <select class="form-control goodst" type="select" style="margin-top:10px;  margin-left:10px; width:95%" name="type" required>
 						               <option value="" disabled selected>Select Goods Type</option>									   
                                      </select>
-									 <input type="number" name="price" class="form-control" id="z3" placeholder="Enter Good Price"  style="margin-top:10px;  margin-left:10px;" required/>
-									 <input type="text" name="departuredate" class="form-control" id="z4" placeholder="Enter Departure Date"  style="margin-top:10px;  margin-left:10px;" required/>
-									 <input type="text" name="departuretime" class="form-control" id="z5" placeholder="Enter Departure Time"  style="margin-top:10px;  margin-left:10px;" required/>
-									 <input type="text" name="exportcompany" class="form-control" id="z6" placeholder="Enter Export Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px;"/>
-									 <input type="text" name="importcompany" class="form-control" id="z7" placeholder="Enter Import Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px;"/>
-									 <select class="form-control" id="arrived" style="margin-top:10px;  margin-left:10px;" name="arrived" required>
+									 <input type="number" name="price" class="form-control" id="z3" placeholder="Enter Good Price"  style="margin-top:10px;  margin-left:10px; width:95%" required/>
+									 <input type="text" name="departuredate" class="form-control" id="z4" placeholder="Enter Departure Date"  style="margin-top:10px;  margin-left:10px; width:95%" required/>
+									 <input type="text" name="departuretime" class="form-control" id="z5" placeholder="Enter Departure Time"  style="margin-top:10px;  margin-left:10px; width:95%" required/>
+									 <input type="text" name="exportcompany" class="form-control" id="z6" placeholder="Enter Export Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px; width:95%"/>
+									 <input type="text" name="importcompany" class="form-control" id="z7" placeholder="Enter Import Company Name (Empty for individuals)" style="margin-top:10px;  margin-left:10px;width:95%"/>
+									 <select class="form-control" id="arrived" style="margin-top:10px;  margin-left:10px; width:95%" name="arrived" required>
 									   <option value="" disabled selected>Has good arrived?</option>
 						               <option value="yes">Yes</option>
                                        <option value="no">No</option>		
 									 </select>
 									 
 									 <div class="arr" style="display:none;">
-									   <input type="text" name="arrivaldate" class="form-control" id="z10" placeholder="Enter Arrival Date"  style="margin-top:10px;  margin-left:10px;" />
-									   <input type="text" name="arrivaltime" class="form-control" id="z11" placeholder="Enter Arrival Time"  style="margin-top:10px;  margin-left:10px;" />
+									   <input type="text" name="arrivaldate" class="form-control" id="z10" placeholder="Enter Arrival Date"  style="width:95%; margin-top:10px;  margin-left:10px;" />
+									   <input type="text" name="arrivaltime" class="form-control" id="z11" placeholder="Enter Arrival Time"  style="width:95%; margin-top:10px;  margin-left:10px;" />
 									 </div>
 									 
 									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds0" style="margin-top:10px;">Add</button>
@@ -358,10 +360,10 @@
                         <div class="modal-body text-center" id="overflowControl">
                             
                             <div class="row" id="addTax">
-                                <form role="form text-center" method='POST' id="tform">
-                                     <input type="text" name="type" class="form-control" id="y1" style="margin-top:10px;  margin-left:10px;" placeholder="Enter Good Type Name"  required/>
-									 <input type="number" name="i-tax" class="form-control" id="y2" placeholder="Enter Tax Rate for individual"  style="margin-top:10px;  margin-left:10px;" required/>
-									 <input type="number" name="c-tax" class="form-control" id="y3" placeholder="Enter Tax Rate for group"  style="margin-top:10px;  margin-left:10px;" required/>
+                                <form role="form text-center" method='POST' id="tform" style="width:100%;">
+                                     <input type="text" name="type" class="form-control" id="y1" style="margin-top:10px;  margin-left:10px; width:95%" placeholder="Enter Good Type Name"  required/>
+									 <input type="number" name="i-tax" class="form-control" id="y2" placeholder="Enter Tax Rate for individual"  style="width:95%; margin-top:10px;  margin-left:10px;" required/>
+									 <input type="number" name="c-tax" class="form-control" id="y3" placeholder="Enter Tax Rate for corporate"  style="width:95%; margin-top:10px;  margin-left:10px;" required/>
 									 <button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds1" style="margin-top:10px;">Add</button>
                                 </form>
                             </div>
@@ -371,7 +373,35 @@
                     </div>
                 </div>
             </div>
-
+           
+		   <div class="modal fade" id="edituser">
+                <div class="modal-dialog modal-lg" style="height:250px;" id="f1">
+                    <div class="modal-content" id="shadow">
+                        <div class="modal-header"><span style="font-size:18px; margin:auto;" id="headis1">Add New User</span></div>
+                        <div class="modal-body text-center" id="overflowControl">
+                            
+                            <div class="row" id="adduser">
+                                <form role="form text-center" method='POST' action="/editit" id="uform" style="width:100%;">
+                                     <input class="form-control" id="o1" type="text" name="name" placeholder="Name" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" id="o2" type="text" name="license" placeholder="License Number" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" id="o3" type="text" name="office" placeholder="Office Name" style="margin-top:10px; margin-left:10px; width:95%" required readonly>
+									 <input class="form-control" id="o4" type="text" name="email" placeholder="Email Address" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" id="o5" type="text" name="username" placeholder="Username" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" id="o6" type="password" name="password" placeholder="Password" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <select class="form-control" id="o7" type="select" style="margin-top:10px; margin-left:10px; pointer-events:none; width:95%" name="post" required>
+						               <option value="" disabled selected>Post</option>
+						               <option value="chief">Department Chief</option>
+						               <option value="officer">Officer</option>
+						               <option value="operator">Computer Operator</option>
+						            </select>
+									<button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="adds" style="margin-top:10px;">Add</button>
+                                </form>
+                            </div>
+						</div>
+                        <div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
     
     <script src="/static/js/dashboard.js"></script>
     

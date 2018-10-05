@@ -43,12 +43,15 @@ let arrivedSchema=new mongoose.Schema({
   },
   taxamount:{
     type:Number  
+  },
+  officeName:{
+     type:String
   }
 });
 
-arrivedSchema.statics.withbarcode=function(res){ //corporate arrived with barcode
+arrivedSchema.statics.withbarcode=function(office,res){ //corporate arrived with barcode
     let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
@@ -68,9 +71,9 @@ arrivedSchema.statics.withbarcode=function(res){ //corporate arrived with barcod
    });
 }
 
-arrivedSchema.statics.withnobarcode=function(res){ //corporate arrived with no barcode
+arrivedSchema.statics.withnobarcode=function(office,res){ //corporate arrived with no barcode
    let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
@@ -90,9 +93,9 @@ arrivedSchema.statics.withnobarcode=function(res){ //corporate arrived with no b
    });
 }
 
-arrivedSchema.statics.withbarcode1=function(res){ //corporate pending with barcode
+arrivedSchema.statics.withbarcode1=function(office,res){ //corporate pending with barcode
    let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
@@ -112,9 +115,9 @@ arrivedSchema.statics.withbarcode1=function(res){ //corporate pending with barco
    });
 }
 
-arrivedSchema.statics.withnobarcode1=function(res){ //corporate pending with no barcode
+arrivedSchema.statics.withnobarcode1=function(office,res){ //corporate pending with no barcode
   let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
@@ -134,9 +137,9 @@ arrivedSchema.statics.withnobarcode1=function(res){ //corporate pending with no 
    });
 }
 
-arrivedSchema.statics.withbarcode2=function(res){ //individual arrived with barcode
+arrivedSchema.statics.withbarcode2=function(office,res){ //individual arrived with barcode
    let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
@@ -156,9 +159,9 @@ arrivedSchema.statics.withbarcode2=function(res){ //individual arrived with barc
    });
 }
 
-arrivedSchema.statics.withnobarcode2=function(res){ //individual arrived with no barcode
+arrivedSchema.statics.withnobarcode2=function(office,res){ //individual arrived with no barcode
   let data=new Array();
-   this.find({},(err,result)=>{
+   this.find({officeName:office},(err,result)=>{
      if(result.length==0){
 		 res.send(JSON.stringify({data:"no"}));
 	 }else{
