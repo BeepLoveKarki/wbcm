@@ -3,6 +3,7 @@ let path=require('path');
 let parser=require('body-parser');
 let cors=require('cors');
 let bcrypt=require('bcryptjs');
+let fs=require('fs');
 let app=express();
 let mongoose=require('./server/db/mongoose.js');
 let {pending,arrived}=require('./server/models/goods.js');
@@ -13,6 +14,22 @@ let session = require('express-session');
 let MongoStore = require('connect-mongo')(session);
 let data;
 let adbs = require("ad-bs-converter");
+let plotly = require('plotly')({"username": "beeplove", "apiKey": "upXuDEOP2xztvW4h59LF"});
+
+let data1 = [{x:[0,1,2], y:[3,2,1], type: 'bar'}];
+
+var imgOpts = {
+    format: 'png',
+    width: 1000,
+    height: 500
+};
+
+plotly.getImage(data1, imgOpts, function (error, imageStream) {
+    if (error) return console.log (error);
+
+    var fileStream = fs.createWriteStream('1.png');
+    imageStream.pipe(fileStream);
+});
 
 let options={
   url:'mongodb://localhost:27017/wbcm-sessions'
@@ -334,12 +351,36 @@ app.get("/tax",(req,res)=>{
 });
 
 app.get("/reportdata",(req,res)=>{
-  let date=new Date();
+  let itax=new Array();
+  let ctax=new Array();
+  let dmonths=new Array();
+  let tmonths=new Array();
+  let tamt=new Array();
+  let date=new Date();	
   let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
   let month=adbs.ad2bs(sdate)["en"]["strMonth"];
   let year=adbs.ad2bs(sdate)["en"]["year"];
-  yreport.find({year:year,"monthdata.month":month},(err,result)=>{
-      
+  yreport.findOne({year:year},(err,result)=>{
+      if(result==null){
+	     res.send(JSON.stringify({data:"no"}));
+	  }else{
+		result["monthdata"].forEach((val)=>{
+		   itax.push(val["itax"]);
+		   ctax.push(val["ctax"]);
+		   dmonths.push(val["month"]);
+		});
+	    treport.find({year:year},(err1,result1)=>{
+	     if(result1.length==0){
+		   res.send(JSON.stringify({target:"no"}));
+		 }else{
+		   result1.forEach((val)=>{
+			   tmonths.push(val["month"]);
+			   tamt.push(val["amount"]);
+		   });
+		   res.send(JSON.stringify({itax:itax,ctax:ctax,dmonths:dmonths,tmonths:tmonths,tamt:tamt}));
+		 }
+	    });
+	  }
   });
 });
 

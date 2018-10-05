@@ -229,7 +229,7 @@ $.get("/getit").then((res)=>{
 $("#sform").submit((e)=>{
    e.preventDefault();
    $.post("/settarget",$("#sform").serialize()).then((res)=>{
-      $("#targetit").modal('show');
+      $("#targetit").modal('hide');
 	  $("#ee").text("Target has been successfully set");
 	  $("#nope").modal('show');
    });
@@ -241,8 +241,38 @@ function setit(){
 
 function reporttable(){
    $.get("/reportdata").then((res)=>{
-     alert(res);
+     let data=$.parseJSON(res);
+	 if(data["data"]=="no"){
+	   $("#ee").text("No data found for report analysis");
+	   $("#nope").modal('show');
+	 }else if(data["target"]=="no"){
+	   $("#ee").text("Please set at least one fiscal year (month) target amount to view report");
+	   $("#nope").modal('show');
+	 }else{
+	    $("#rtable").empty();
+		data["dmonths"].forEach((val,i)=>{
+		  let tamt,gap;
+		  if(val==data["tmonths"][i]){
+		     tamt=data["tamt"][i];
+			 gap=data["itax"][i]+data["ctax"][i]-data["tamt"][i];
+		  }else{
+		    tamt="-";
+			gap="-";
+		  }
+		  $("#rtable").append("<tr id=\"report"+i+"\"><td style=\"text-align:center;\">"+val+"</td><td style=\"text-align:center;\">"+data["itax"][i]+"</td>\
+		  <td style=\"text-align:center;\">"+data["ctax"][i]+"</td><td style=\"text-align:center;\">"+(data["itax"][i]+data["ctax"][i])+"</td>\
+		  <td style=\"text-align:center;\">"+tamt+"</td><td style=\"text-align:center;\">"+gap+"</td</tr>");
+		});
+		$(".rtable-data").show();
+		$(".reporta").hide();
+	 }
    });
+}
+
+
+function backreport(){
+   $(".rtable-data").hide();
+   $(".reporta").show();
 }
 
 function graph(){
