@@ -205,6 +205,60 @@
 	 </form>
 	</section>
 	
+	<section class="reporting text-center" style="margin-top:-250px;">
+	 <hr>
+	 
+	 <div class="table-responsive rtable-data" style="height:525px; display:none;">
+          <h5 id="mmd"></h5>
+		  <button class="btn btn-primary" type="button" onclick="backreport()" style="margin-top:20px; margin-bottom:20px;">Go Back</button>
+		  <table class="table" style="border:none;">
+			<thead>
+               <tr>
+               <td>Month</td>
+               <td>Individual</td>
+               <td>Corporate</td>
+			   <td>Total</td>
+			   <td>Target</td>
+			   <td>Gap</td>
+               </tr>
+            </thead>
+            <tbody id="rtable">
+			</tbody>
+		  </table>
+	  </div>
+	 
+    <div class="reporta">	 
+	  <h5 style="margin-top:40px;"> Please refer below for report analysis</h5>
+	  <button type="button" class="btn btn-warning" onclick="reporttable()" style="margin-bottom:30px; margin-top:30px; color:white;">View Tabular Data</button><br/>
+	   <button type="button" class="btn btn-primary" onclick="graph()">View Graphical Data</button>
+	</div>
+	</section>
+	
+	<section class="setting text-center" style="margin-top:-250px;">
+	 <hr>
+	  <h5 id="target" style="margin-top:40px;"></h5>
+	  <button type="button" class="btn btn-success" onclick="setit()" style="margin-bottom:30px; margin-top:30px; color:white;">Set Now</button><br/>
+	</section>
+	
+	  <div class="modal fade" id="targetit">
+                <div class="modal-dialog modal-lg" style="height:450px;" id="f1">
+                    <div class="modal-content" id="shadow">
+                        <div class="modal-header"><span style="font-size:18px; margin:auto;" id="headis0">Add New Good</span></div>
+                        <div class="modal-body text-center" id="overflowControl">
+                            
+                            <div class="row" id="settarget">
+                                <form role="form text-center" method='POST' id="sform">
+                                   
+									<input type="number" name="target"  class="form-control" id="u1" placeholder="Enter Amount" style="margin-top:30px; margin-left:10px; width:100%"/>
+	                                <button type="submit" class="btn btn-outline-primary btn-lg" value="submit" id="setb" style="margin-top:10px;">Set</button>
+								 </form>
+							</div>
+						</div>
+						<div class="modal-footer"><button class="btn btn-outline-danger" data-dismiss="modal">Close</button></div>
+					</div>
+				 </div>
+		</div>
+	  
 	  <div class="modal fade" id="nope" tabindex="-1" style="margin-top:30px;">
                 <div class="modal-dialog" style="height:450px;" id="f13">
                     <div class="modal-content">

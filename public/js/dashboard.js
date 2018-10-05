@@ -220,6 +220,35 @@ function newgood(){
 	});
 }
 
+$.get("/getit").then((res)=>{
+   let data=$.parseJSON(res);
+   $("#target").text("Please set target for month "+data["month"]+" of fiscal year "+data["year"]);
+   $("#mmd").text("Report for fiscal year "+data["year"]);
+});
+
+$("#sform").submit((e)=>{
+   e.preventDefault();
+   $.post("/settarget",$("#sform").serialize()).then((res)=>{
+      $("#targetit").modal('show');
+	  $("#ee").text("Target has been successfully set");
+	  $("#nope").modal('show');
+   });
+});
+
+function setit(){
+   $("#targetit").modal('show');
+}
+
+function reporttable(){
+   $.get("/reportdata").then((res)=>{
+     alert(res);
+   });
+}
+
+function graph(){
+
+}
+
 $('#arrived').on('change', function() {
     let soption = $( "#arrived option:selected" ).text();
     if(soption=="Yes"){

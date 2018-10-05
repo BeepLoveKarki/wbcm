@@ -8,9 +8,11 @@ let mongoose=require('./server/db/mongoose.js');
 let {pending,arrived}=require('./server/models/goods.js');
 let tax=require('./server/models/tax.js');
 let client=require('./server/models/client.js');
+let {mreport,yreport,treport}=require('./server/models/report.js');
 let session = require('express-session');
 let MongoStore = require('connect-mongo')(session);
 let data;
+let adbs = require("ad-bs-converter");
 
 let options={
   url:'mongodb://localhost:27017/wbcm-sessions'
@@ -127,7 +129,10 @@ app.post("/deletegood",(req,res)=>{
 });
 
 app.post("/barcode",(req,res)=>{ //barcode scanning
-  //req.body["barcode"], req.body["date"], req.body["time"]
+  let date=new Date();
+  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
+  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let year=adbs.ad2bs(sdate)["en"]["year"];
   arrived.pendtoarrive(req.body["barcode"],req.body["date"],req.body["time"],res);
 });
 
@@ -145,33 +150,113 @@ app.post("/gettax",(req,res)=>{
   });
 });
 
+
+
 app.post("/newgood",(req,res)=>{
-  let arriveds;
+  let arriveds,amt=0,amt1=0;
+  let date=new Date();
+  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
+  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let year=adbs.ad2bs(sdate)["en"]["year"];
   tax.findOne({goodtype:req.body["type"]},(err,result)=>{
 	let pendings=new pending({barcode:req.body["barcode"],name:req.body["name"],goodtype:req.body["type"],price:req.body["price"],departureTime:req.body["departuretime"],
     departureDate:req.body["departuredate"],importCompany:req.body["importcompany"],exportCompany:req.body["exportcompany"]});
 	
 	if(req.body["importcompany"].length==0 && req.body["exportcompany"].length==0){
-      let amt=(result["itax"]/100)*req.body["price"];
+      amt=(result["itax"]/100)*req.body["price"];
 	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["itax"],taxamount:amt});
 	}else{
-	  let amt=(result["ctax"]/100)*req.body["price"];
-	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["ctax"],taxamount:amt});
+	  amt1=(result["ctax"]/100)*req.body["price"];
+	  arriveds=new arrived({pendingDetails:[],arrivalTime:req.body["arrivaltime"],arrivalDate:req.body["arrivaldate"],taxrate:result["ctax"],taxamount:amt1});
 	}
 	
 	if(req.body["oldones"]){
-	   arrived.deleteOne({"pendingDetails.name":req.body["oldones"]},(err,result)=>{
+	    
+		arrived.deleteOne({"pendingDetails.name":req.body["oldones"]},(err,result)=>{ //i think left here
 	      arriveds.pendingDetails.push(pendings);
           arriveds.save().then((err,doc)=>{
               res.send(JSON.stringify({status:"done"}));
-            });
+			});
 	   });
-	}else{ 
-	    arriveds.pendingDetails.push(pendings);
-        arriveds.save().then((err,doc)=>{
-         res.send(JSON.stringify({status:"done"}));
-        });
-    }
+	
+	}else{
+	  if(req.body["arrivaltime"].length!=0 && req.body["arrivaldate"]!=0){
+        yreport.findOne({year:year},(err,result)=>{
+		  if(result==null){
+			let yreports,mreports;
+			if(amt!=0){
+			  yreports=new yreport({year:year,totalitax:amt,monthdata:[]});
+              mreports=new mreport({month:month,itax:amt});
+			  yreports.monthdata.push(mreports);
+			}
+			if(amt1!=0){
+			  yreports=new yreport({year:year,totalctax:amt1,monthdata:[]});
+              mreports=new mreport({month:month,ctax:amt1});
+			  yreports.monthdata.push(mreports);
+			}
+		     yreports.save().then((err,doc)=>{
+			    arriveds.pendingDetails.push(pendings);
+                    arriveds.save().then((err,doc)=>{
+                          res.send(JSON.stringify({status:"done"}));
+                });	
+			 });
+		  }else{
+		      let r,mreports1;
+			  if(amt!=0){
+			    r={
+				  $inc:{'totalitax':amt}
+				};
+			  }
+			  if(amt1!=0){
+			     r={
+				   $inc:{'totalctax':amt1}
+				 };
+			  }
+			  
+			  yreport.findOneAndUpdate({year:year},r,(err,result)=>{
+				  yreport.findOne({"monthdata.month":month},(err,result)=>{
+					 if(result==null){
+					   result.monthdata.push(mreports);
+					   if(amt!=0){
+                            mreports1=new mreport({month:month,itax:amt});							   
+					     }
+					   if(amt1!=0){
+							mreports1=new mreport({month:month,ctax:amt1});   
+					    }
+					 }else{
+					   let data,ry;
+					   result.monthdata.forEach((val,index)=>{
+						  if(val["month"]==month){
+						     if(amt!=0){
+					           ry=val["itax"]+amt;
+                               mreports1=new mreport({month:month,itax:ry});							   
+					         }
+					         if(amt1!=0){
+					           ry=val["ctax"]+amt1;
+							   mreports1=new mreport({month:month,ctax:ry});   
+					         }
+							 result.monthdata.splice(index,1);
+						  }
+					   });
+					   result.monthdata.push(mreports1);
+					 }
+					 yreport.findOneAndUpdate({year:year},{monthdata:result.monthdata},(err,result1)=>{
+			             arriveds.pendingDetails.push(pendings);
+                           arriveds.save().then((err,doc)=>{
+                               res.send(JSON.stringify({status:"done"}));
+                         });		     
+		  			 });
+				  });					  
+ 			  });
+		  }
+    });
+    }else{
+	  arriveds.pendingDetails.push(pendings);
+          arriveds.save().then((err,doc)=>{
+                    res.send(JSON.stringify({status:"done"}));
+           });
+	   }
+	}
   });
 });
 
@@ -200,6 +285,33 @@ app.get("/goodtype",(req,res)=>{
   });
 });
 
+app.get("/getit",(req,res)=>{
+  let date=new Date();
+  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
+  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let year=adbs.ad2bs(sdate)["en"]["year"];
+  res.send(JSON.stringify({year:year,month:month}));
+});
+
+app.post("/settarget",(req,res)=>{
+  let date=new Date();
+  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
+  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let year=adbs.ad2bs(sdate)["en"]["year"];
+    treport.findOne({year:year,month:month},(err,result)=>{
+	   if(result==null){
+	     let treports=new treport({year:year,month:month,amount:req.body["target"]});
+		 treports.save().then((err,doc)=>{
+		    res.send(JSON.stringify({status:"done"}));
+		 });
+	   }else{
+	      treport.findOneAndUpdate({year:year,month:month},{$set:{amount:req.body["target"]}},(err,result)=>{
+			 res.send(JSON.stringify({status:"done"}));
+		  });
+	   }
+	});
+});
+
 function saveit(taxes,res){
     taxes.save().then((err,doc)=>{
       res.send(JSON.stringify({status:"done"}));
@@ -219,6 +331,16 @@ app.get("/tax",(req,res)=>{
 	}
   });
    
+});
+
+app.get("/reportdata",(req,res)=>{
+  let date=new Date();
+  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
+  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let year=adbs.ad2bs(sdate)["en"]["year"];
+  yreport.find({year:year,"monthdata.month":month},(err,result)=>{
+      
+  });
 });
 
 app.post("/deletetax",(req,res)=>{
