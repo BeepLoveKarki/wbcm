@@ -1,4 +1,5 @@
 let mongoose=require('mongoose');
+let {mreport,yreport,treport}=require('./report.js');
 
 let pendingSchema=new mongoose.Schema({
   barcode:{
@@ -181,14 +182,44 @@ arrivedSchema.statics.withnobarcode2=function(office,res){ //individual arrived 
    });
 }
 
-arrivedSchema.statics.pendtoarrive=function(barcode,date,time,res){
+arrivedSchema.statics.pendtoarrive=function(barcode,date,time,year,month,res){
+  let m,datas,cc;
   this.findOneAndUpdate({"pendingDetails.barcode":barcode},{$set:{arrivalDate:date,arrivalTime:time}},(err,result)=>{
 	if(result==null){
 	   res.send(JSON.stringify({data:"no"})); //no data entered
 	}else{
-	    res.send(JSON.stringify({data:result}));
+	  if(result["pendingDetails"][0]["exportCompany"].length==0 && result["pendingDetails"][0]["importCompany"].length==0){
+	    cc={itax:result["taxamount"]};
+	  }else{
+	    cc={ctax:result["taxamount"]};
+	  }
+	    yreport.findOneAndUpdate({year:year},{$inc:cc},(err,result1)=>{
+		  result1["monthdata"].forEach((val,i)=>{
+		    let r;
+			if(val["month"]==month){
+			   if(result["pendingDetails"][0]["exportCompany"].length==0 && result["pendingDetails"][0]["importCompany"].length==0){
+			       val["itax"]+=result["taxamount"];
+			   }else{
+			      val["ctax"]+=result["taxamount"];
+			   }
+			   r=val;
+			   m=month;
+			   result1["monthdata"].splice(i);
+			   result1["monthdata"].push(r);
+			   datas=result1["monthdata"];
+			}
+		  });
+		  yreport.findOneAndUpdate({year:year},{$pull:{monthdata:{"monthdata.month":m}}},(err0,result2)=>{
+			 yreport.findOneAndUpdate({year:year},{$push:{monthdata:datas}},(err1,result3)=>{
+			    res.send(JSON.stringify({data:result})); 
+			 });
+		  });
+	      
+	    });
+	  
 	}
   });
+
 }
 
 let pending=mongoose.model("pending",pendingSchema);

@@ -69,6 +69,7 @@ clientSchema.statics.findbyemail=function(email,callback){
 
 clientSchema.statics.findbypost=function(office,postname,callback){
   this.findOne({officeName:office,post:postname},(err,result)=>{
+	  console.log(err);
 	  callback(result);
   });
 }

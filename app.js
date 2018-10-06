@@ -210,9 +210,20 @@ app.post("/deletegood",(req,res)=>{
 app.post("/barcode",(req,res)=>{ //barcode scanning
   let date=new Date();
   let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
-  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
+  let month=adbs.ad2bs(sdate)["en"]["month"];
+  let monthname=adbs.ad2bs(sdate)["en"]["strMonth"];
   let year=adbs.ad2bs(sdate)["en"]["year"];
-  arrived.pendtoarrive(req.body["barcode"],req.body["date"],req.body["time"],res);
+  let day=adbs.ad2bs(sdate)["en"]["day"];
+  let d=date.toLocaleString();
+  let time=d.substring(d.indexOf(" ")+1,d.lastIndexOf(":"));
+  if(month<10){
+    month="0"+month;
+  }
+  if(day<10){
+    day="0"+day;
+  }
+  let date1=year+"-"+month+"-"+day;
+  arrived.pendtoarrive(req.body["barcode"],date1,time,year,monthname,res);
 });
 
 app.post("/gettax",(req,res)=>{

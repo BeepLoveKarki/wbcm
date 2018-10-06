@@ -29,8 +29,9 @@ function adduser(){
 $("#uform").submit((e)=>{
   e.preventDefault();
   if(emailcheck($("#email").val())){
-     $.post("/signup",$(".signup").serialize()).then((res)=>{
+     $.post("/signup",$("#uform").serialize()).then((res)=>{
 	    let data=$.parseJSON(res);
+		$("#newuser").modal('hide');
 		if(data.exists=="yes"){
 		  $("#err").text("An account under this email address already exists");
 	      $("#err").show();
@@ -46,6 +47,7 @@ $("#uform").submit((e)=>{
 	 },(err)=>{
 	 });
    }else{
+	 $("#newuser").modal('hide'); 
      $("#err").text("Please enter a valid email address");
 	 $("#err").show();
    }

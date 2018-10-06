@@ -21,10 +21,31 @@ ScanditSDK.BarcodePicker.create(document.getElementById("scandit-barcode-picker"
 
 function barcoderead(barcodePicker){
 	barcodePicker.onScan(function(scanResult) {
-    alert(scanResult.barcodes.reduce(function(string, barcode) {
-       return string + ScanditSDK.Barcode.Symbology.toHumanizedName(barcode.symbology) + ": " + barcode.data + "\n";
+    scanResult.barcodes.reduce(function(string, barcode) {
+       $.post("/barcode",{barcode:barcode.data}).then((res)=>{
+	      let data=$.parseJSON(res);
+		  if(data["data"]=="no"){
+		    $("#ee").text("No data entered found");
+			$("#nope").modal('show');
+		  }else{
+		   $("#a").text(data["data"]["pendingDetails"][0]["barcode"]);
+	       $("#b").text(data["data"]["pendingDetails"][0]["exportCompany"]);
+		   $("#c").text(data["data"]["pendingDetails"][0]["importCompany"]);
+		   $("#d").text(data["data"]["pendingDetails"][0]["name"]);
+		   $("#e").text(data["data"]["pendingDetails"][0]["goodtype"]);
+		   $("#f").text(data["data"]["pendingDetails"][0]["price"]);
+		   $("#g").text(data["data"]["pendingDetails"][0]["departureDate"]+" "+data["data"]["pendingDetails"][0]["departureTime"]);
+		   $("#h").text(data["data"]["arrivalDate"]+" "+data["data"]["arrivalTime"]);
+		   $("#i").text(data["data"]["taxamount"]);
+		   if(data["data"]["pendingDetails"][0]["exportCompany"].length==0 && data["data"]["pendingDetails"][0]["importCompany"].length==0){
+		      $("#im").hide();
+			  $("#ex").hide();
+		   }
+		   $("#data").modal('show');
+	      }
+	   });
 	   //barcodePicker.destroy(); 
-     }, ""));
+     }, "");
     });
 }
 

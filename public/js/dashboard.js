@@ -1,4 +1,25 @@
-//$("#mm").text()
+if($("#mm").text()=="Department Chief"){
+   $(".choose1").hide();
+   $("#ab").hide();
+   $(".calculate").hide();
+   $(".setting").hide();
+   $(".choose").css({
+     "margin-top":"-168px"
+   });
+   $("#yy").css({
+     "margin-top":"70px"
+   });
+}else if($("#mm").text()=="Officer"){
+    $(".choose1").hide();
+	$(".choose").css("margin-top","-168px");
+	$(".calculate").hide();
+}else{
+	$(".choose").hide();
+	$(".reporting").hide();
+    $(".setting").hide();
+}
+
+
 let tdata,gdata,x=0,y;
 
 $.get("/goodtype").then((res)=>{

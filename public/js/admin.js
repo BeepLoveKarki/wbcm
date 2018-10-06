@@ -1,4 +1,3 @@
-
 $(".signin").submit((e)=>{
    e.preventDefault();
      $.post("/adminsignin",$(".signin").serialize()).then((res)=>{
