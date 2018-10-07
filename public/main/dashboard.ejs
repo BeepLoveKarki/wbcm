@@ -13,7 +13,7 @@
 	<script src="/static/vendor/jquery.min.js"></script>
     <script src="/static/vendor/bootstrap.min.js"></script>
     <script src="/static/vendor/jquery.easing.min.js"></script>
-	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script src="/static/vendor/plotly.js"></script>
   </head>
 
   <body>
@@ -322,7 +322,7 @@
                             <div class="row" id="addGood">
                                 <form role="form text-center" method='POST' id="gform" style="width:100%;">
                                    
-									<input type="text" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:95%"/>
+									<input type="number" name="barcode"  class="form-control" id="z1" placeholder="Enter Barcode (Empty for no availability)" style="margin-top:30px; margin-left:10px; width:95%"/>
                                     <input type="text" name="name" class="form-control" id="z2" style="margin-top:10px;  margin-left:10px; width:95%" placeholder="Enter Good Name"  required/>
                                     <select class="form-control goodst" type="select" style="margin-top:10px;  margin-left:10px; width:95%" name="type" required>
 						               <option value="" disabled selected>Select Goods Type</option>									   
@@ -384,7 +384,7 @@
                             <div class="row" id="adduser">
                                 <form role="form text-center" method='POST' action="/editit" id="uform" style="width:100%;">
                                      <input class="form-control" id="o1" type="text" name="name" placeholder="Name" style="margin-top:10px; margin-left:10px; width:95%" required>
-									 <input class="form-control" id="o2" type="text" name="license" placeholder="License Number" style="margin-top:10px; margin-left:10px; width:95%" required>
+									 <input class="form-control" id="o2" type="number" name="license" placeholder="License Number" style="margin-top:10px; margin-left:10px; width:95%" required>
 									 <input class="form-control" id="o3" type="text" name="office" placeholder="Office Name" style="margin-top:10px; margin-left:10px; width:95%" required readonly>
 									 <input class="form-control" id="o4" type="text" name="email" placeholder="Email Address" style="margin-top:10px; margin-left:10px; width:95%" required>
 									 <input class="form-control" id="o5" type="text" name="username" placeholder="Username" style="margin-top:10px; margin-left:10px; width:95%" required>

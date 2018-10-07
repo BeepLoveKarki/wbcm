@@ -23,6 +23,7 @@ function backemployee(){
 }
 
 function adduser(){
+  $("#uform").trigger('reset');
   $("#newuser").modal('show');
 }
 

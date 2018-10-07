@@ -243,11 +243,21 @@ app.post("/gettax",(req,res)=>{
 
 
 app.post("/newgood",(req,res)=>{
-  let arriveds,amt=0,amt1=0;
-  let date=new Date();
-  let sdate=((date.getFullYear())+"/"+(date.getMonth()+1)+"/"+(date.getDate())).toString();
-  let month=adbs.ad2bs(sdate)["en"]["strMonth"];
-  let year=adbs.ad2bs(sdate)["en"]["year"];
+  let arriveds,amt=0,amt1=0,year,m;
+  if(req.body["arrivaltime"].length!=0 && req.body["arrivaldate"]!=0){
+    year=req.body["arrivaldate"].substring(0,4);
+    m=req.body["arrivaldate"].substring(5,7);
+  }else{
+    year=req.body["departuredate"].substring(0,4);
+    m=req.body["departuredate"].substring(5,7);
+  }
+  if(m[0]=="0"){
+     m=Number(m.substring(1,m.length));
+  }else{
+    m=Number(m);
+  }
+  let months=["Baisakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
+  let month=months[m-1];
   tax.findOne({goodtype:req.body["type"]},(err,result)=>{
 	let pendings=new pending({barcode:req.body["barcode"],name:req.body["name"],goodtype:req.body["type"],price:req.body["price"],departureTime:req.body["departuretime"],
     departureDate:req.body["departuredate"],importCompany:req.body["importcompany"],exportCompany:req.body["exportcompany"]});
@@ -303,16 +313,21 @@ app.post("/newgood",(req,res)=>{
 				 };
 			  }
 			  
-			  yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},r,(err,result)=>{
-				  yreport.findOne({"monthdata.month":month,officeName:req.session["office"]},(err,result)=>{
+			  yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},r,(err,result1)=>{
+				  yreport.findOne({year:year,"monthdata.month":month,officeName:req.session["office"]},(err,result)=>{
 					 if(result==null){
-					   result.monthdata.push(mreports);
 					   if(amt!=0){
                             mreports1=new mreport({month:month,itax:amt});							   
 					     }
 					   if(amt1!=0){
 							mreports1=new mreport({month:month,ctax:amt1});   
 					    }
+						yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},{$push:{monthdata:mreports1}},(err,result1)=>{
+			             arriveds.pendingDetails.push(pendings);
+                           arriveds.save().then((err,doc)=>{
+                               res.send(JSON.stringify({status:"done"}));
+                         });		     
+		  			   });
 					 }else{
 					   let data,ry;
 					   result.monthdata.forEach((val,index)=>{
@@ -329,13 +344,13 @@ app.post("/newgood",(req,res)=>{
 						  }
 					   });
 					   result.monthdata.push(mreports1);
-					 }
-					 yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},{monthdata:result.monthdata},(err,result1)=>{
+					   yreport.findOneAndUpdate({year:year,officeName:req.session["office"]},{monthdata:result.monthdata},(err,result1)=>{
 			             arriveds.pendingDetails.push(pendings);
                            arriveds.save().then((err,doc)=>{
                                res.send(JSON.stringify({status:"done"}));
                          });		     
 		  			 });
+					 }
 				  });					  
  			  });
 		  }
@@ -466,7 +481,7 @@ app.post("/reportdata",(req,res)=>{
   let tmonths=new Array();
   let tamt=new Array();
   yreport.findOne({year:req.body["year"],officeName:req.session["office"]},(err,result)=>{
-      if(result==null){
+	  if(result==null){
 	     res.send(JSON.stringify({data:"no"}));
 	  }else{
 		result["monthdata"].forEach((val)=>{
@@ -474,7 +489,7 @@ app.post("/reportdata",(req,res)=>{
 		   ctax.push(val["ctax"]);
 		   dmonths.push(val["month"]);
 		});
-	    treport.find({year:year,officeName:req.session["office"]},(err1,result1)=>{
+	    treport.find({year:req.body["year"],officeName:req.session["office"]},(err1,result1)=>{
 	     if(result1.length==0){
 		   res.send(JSON.stringify({target:"no"}));
 		 }else{
@@ -482,6 +497,7 @@ app.post("/reportdata",(req,res)=>{
 			   tmonths.push(val["month"]);
 			   tamt.push(val["amount"]);
 		   });
+		   //console.log(JSON.stringify({itax:itax,ctax:ctax,dmonths:dmonths,tmonths:tmonths,tamt:tamt}));
 		   res.send(JSON.stringify({itax:itax,ctax:ctax,dmonths:dmonths,tmonths:tmonths,tamt:tamt}));
 		 }
 	    });

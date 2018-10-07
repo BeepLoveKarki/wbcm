@@ -211,7 +211,9 @@ arrivedSchema.statics.pendtoarrive=function(barcode,date,time,year,month,res){
 		  });
 		  yreport.findOneAndUpdate({year:year},{$pull:{monthdata:{"monthdata.month":m}}},(err0,result2)=>{
 			 yreport.findOneAndUpdate({year:year},{$push:{monthdata:datas}},(err1,result3)=>{
-			    res.send(JSON.stringify({data:result})); 
+			    result["arrivalDate"]=date;
+				result["arrivalTime"]=time;
+				res.send(JSON.stringify({data:result})); 
 			 });
 		  });
 	      

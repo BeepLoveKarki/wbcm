@@ -133,6 +133,7 @@ function editgood(i){
 	$("#arrived").val("no");
 	$.get("/goodtype").then((res)=>{
        let data=$.parseJSON(res);
+	   $(".goodst").empty();
 	   if(data["types"]=="no"){
 	      $(".goodst").append("<option id=\"mc\" value=\"\" disabled>No any goods categories found</option>");
 	   }else{
@@ -219,6 +220,7 @@ function backgood(){
 function newgood(){
 	$.get("/goodtype").then((res)=>{
        let data=$.parseJSON(res);
+	   $(".goodst").empty();
 	   if(data["types"]=="no"){
 	      $(".goodst").append("<option id=\"mc\" value=\"\" disabled>No any goods categories found</option>");
 	   }else{
